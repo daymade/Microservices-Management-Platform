@@ -1,11 +1,12 @@
 # `/scripts`
 
-Scripts to perform various build, install, analysis, etc operations.
+## 环境变量
 
-These scripts keep the root level Makefile small and simple.
+在脚本中用到了以下环境变量：
 
-Examples:
-
-* https://github.com/kubernetes/helm/tree/master/scripts
-* https://github.com/cockroachdb/cockroach/tree/master/scripts
-* https://github.com/hashicorp/terraform/tree/master/scripts
+- `USE_DB`：设置为 `true` 以使用数据库。
+- `DB_HOST`：数据库主机（例如 `localhost` 或 Docker 中的 `db`）。
+- `DB_USER`：数据库用户。
+- `DB_PASSWORD`：数据库密码。
+- `DB_NAME`：数据库名称。
+- `DB_PORT`：数据库端口（默认是 `5432`）。
