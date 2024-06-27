@@ -66,7 +66,6 @@ Demo 中不包含的功能：
 - 非功能需求：
   - API 规范：我们设计符合 [Google API 规范](https://google.aip.dev/) 的 API。
   - 数据量：
-
       - 总 Service 数量：10 ～ 10000
       - 总用户数量：1000 以下
       - 每个用户能够创建的 Service 数量有限，最多创建 10 个 service。
@@ -75,6 +74,7 @@ Demo 中不包含的功能：
 - 技术选型：
 	- 搜索：由于数据量很小，我们不引入搜索引擎，直接在数据库上实现过滤, 现阶段也不用考虑索引。
 	- 存储引擎：我们支持内存数据库和 PostgreSQL 两种存储引擎，内存数据库用于快速演示，PostgreSQL 可以用于生产环境。
+    - 数据库结构：互联网架构中一般不会使用外键，这个数据量很小，外键不会影响性能，所以用了外键。
     - 监控：使用 VictoriaMetrics 和 Grafana 监控服务的性能。
 
 ## 运行环境
@@ -120,7 +120,38 @@ Demo 中不包含的功能：
 	```
 
 ## 业务建模
-
+```
++-------------------+           +-------------------+
+|       User        |           |     Service       |
++-------------------+           +-------------------+
+| - id: int         |1         *| - id: int         |
+| - name: string    +-----------| - name: string    |
+| - email: string   |           | - description: string |
++-------------------+           | - userId: int     |
+                                +-------------------+
+                                      |1
+                                      |
+                                      |*
+                                +-------------------+
+                                |     Version       |
+                                +-------------------+
+                                | - id: int         |
+                                | - version: string |
+                                | - serviceId: int  |
+                                +-------------------+
+                                      |1
+                                      |
+                                      |*
+                                +-------------------+
+                                |       API         |
+                                +-------------------+
+                                | - id: int         |
+                                | - name: string    |
+                                | - path: string    |
+                                | - method: string  |
+                                | - versionId: int  |
+                                +-------------------+
+```
 define the domain model of an api management platform,
 - include the concept of [user,service,version,api]
 - each service can be created by only one user
@@ -128,6 +159,16 @@ define the domain model of an api management platform,
 - each service contains multiple apis, related with specific version
 
 ## 架构图
+
+### 类似 COLA 的分层架构
+
+以 domain 为核心，在表现层可以有 http api 或 grpc 等不同协议的 adapter。
+<img width="566" alt="image" src="https://github.com/daymade/catalog-service-management-api/assets/4291901/4cc9a67b-5356-40a7-840d-6154c8b3d68c">
+
+### 和 Service 相关的类依赖关系
+
+app 层依赖 domain 层的接口，domain 的接口由 infra 层实现，app 负责注入 infra 到 domain，依赖关系为：app -> domain <- infra。
+<img width="561" alt="image" src="https://github.com/daymade/catalog-service-management-api/assets/4291901/071b00b9-4859-4552-9411-68ea64ad3815">
 
 
 ## API 文档
