@@ -6,9 +6,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// Auth 简单的token验证逻辑
 func Auth() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// 简单的token验证逻辑
 		token := c.GetHeader("Authorization")
 		if token == "" {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "No authorization header provided"})
