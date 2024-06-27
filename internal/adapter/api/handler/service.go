@@ -15,6 +15,19 @@ func NewServiceHandler(m *service.Manager) *ServiceHandler {
 	return &ServiceHandler{manager: m}
 }
 
+// ListServices godoc
+// @Summary      Show an account
+// @Description  get string by ID
+// @Tags         accounts
+// @Accept       json
+// @Produce      json
+// @Param        q    query     string  false  "search by q"
+// @Param        sort_by    query     string  false  "sort by field"
+// @Param        sort_direction    query     string  false  "sort direction"
+// @Param        page    query     int  false  "page number"
+// @Param        page_size    query     int  false  "page size"
+// @Success      200  {object}  viewmodel.Service
+// @Router       /services [get]
 func (h *ServiceHandler) ListServices(c *gin.Context) {
 	query := c.DefaultQuery("query", "")
 	sortBy := c.DefaultQuery("sort_by", "name")

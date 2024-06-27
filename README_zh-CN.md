@@ -10,6 +10,7 @@
 - 基于 API Key 的简单认证机制，基于角色的用户授权机制。
 - 支持使用内存和 PostgreSQL 两种存储引擎。
 - 包含测试代码
+- 支持 swagger 文档
 
 文件目录：
 
@@ -52,6 +53,10 @@
 	# 测试获取特定服务详情
 	curl -H "Authorization: Bearer dummy_token" http://localhost:8080/v1/services/1
 	```
+
+## API 文档
+
+http://localhost:8080/swagger/index.html
 
 ## 开发
 

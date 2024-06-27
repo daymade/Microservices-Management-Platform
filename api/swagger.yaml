@@ -1,0 +1,69 @@
+basePath: /api/v1
+definitions:
+  viewmodel.Service:
+    properties:
+      created_at:
+        type: string
+      description:
+        type: string
+      name:
+        type: string
+      owner_id:
+        type: string
+      updated_at:
+        type: string
+      version_count:
+        type: integer
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: daymadev89@gmail.com
+    name: daymade
+  description: This is a platform to manage services.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  title: Catalog Service Management
+  version: "1.0"
+paths:
+  /services:
+    get:
+      consumes:
+      - application/json
+      description: get string by ID
+      parameters:
+      - description: search by q
+        in: query
+        name: q
+        type: string
+      - description: sort by field
+        in: query
+        name: sort_by
+        type: string
+      - description: sort direction
+        in: query
+        name: sort_direction
+        type: string
+      - description: page number
+        in: query
+        name: page
+        type: integer
+      - description: page size
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/viewmodel.Service'
+      summary: Show an account
+      tags:
+      - accounts
+securityDefinitions:
+  BasicAuth:
+    type: basic
+swagger: "2.0"

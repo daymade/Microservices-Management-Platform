@@ -1,4 +1,4 @@
-.PHONY: run-local run-docker
+.PHONY: run-local run-docker build-production gen-doc
 
 run-local:
 	./scripts/run_local.sh
@@ -8,3 +8,6 @@ run-docker:
 
 build-production:
 	./scripts/build_production.sh
+
+gen-doc:
+	swag init -g cmd/server/main.go -o api
