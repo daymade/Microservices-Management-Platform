@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"errors"
+	"catalog-service-management-api/internal/adapter/api/viewmodel"
 	"catalog-service-management-api/internal/app/service"
 	"net/http"
 	"strconv"
@@ -36,24 +38,36 @@ func (h *ServiceHandler) ListServices(c *gin.Context) {
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	pageSize, _ := strconv.Atoi(c.DefaultQuery("page_size", "20"))
 
+	// Validate input
+	if err := validateListServicesInput(query, sortBy, sortDir, page, pageSize); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
 	services, total, err := h.manager.ListServices(query, sortBy, sortDir, page, pageSize)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	service_view_models := services
+	// Convert to view models
+	svm := make([]viewmodel.ServiceListViewModel, len(services))
+	for i, s := range services {
+		svm[i] = viewmodel.NewServiceListViewModel(s)
+	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"services":    service_view_models,
-		"total_count": total,
-		"page":        page,
-		"page_size":   pageSize,
-	})
+	response := viewmodel.NewPaginatedResponse(svm, total, page, pageSize)
+	c.JSON(http.StatusOK, response)
 }
 
 func (h *ServiceHandler) GetService(c *gin.Context) {
 	id := c.Param("id")
+
+	// Validate input
+	if err := validateServiceID(id); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 
 	s, err := h.manager.GetService(id)
 	if err != nil {
@@ -61,7 +75,29 @@ func (h *ServiceHandler) GetService(c *gin.Context) {
 		return
 	}
 
-	service_view_model := s
+	svm := viewmodel.NewServiceDetailViewModel(s)
 
-	c.JSON(http.StatusOK, service_view_model)
+	c.JSON(http.StatusOK, svm)
+}
+
+func validateListServicesInput(query, sortBy, sortDir string, page, pageSize int) error {
+	if page < 1 {
+		return errors.New("page must be greater than 0")
+	}
+	if pageSize < 1 || pageSize > 100 {
+		return errors.New("page_size must be between 1 and 100")
+	}
+	if sortDir != "asc" && sortDir != "desc" {
+		return errors.New("sort_direction must be 'asc' or 'desc'")
+	}
+	// Add more validations as needed
+	return nil
+}
+
+func validateServiceID(id string) error {
+	// Add your validation logic here
+	if id == "" {
+		return errors.New("service ID cannot be empty")
+	}
+	return nil
 }
