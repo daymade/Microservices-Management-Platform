@@ -52,6 +52,7 @@ func (p *PostgresStorage) ListServices(query string, sortBy string, sortDir stri
 	db := p.db.Model(&entity.Service{}).Preload("Versions")
 
 	if query != "" {
+		// GORM 自动为我们处理了 SQL 参数化
 		db = db.Where("name ILIKE ? OR description ILIKE ?", "%"+query+"%", "%"+query+"%")
 	}
 

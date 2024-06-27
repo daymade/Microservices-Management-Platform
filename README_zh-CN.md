@@ -13,8 +13,18 @@
 - 支持 swagger 文档
 
 文件目录：
-
-
+```
+.
+├── Makefile # 项目的 makefile 文件，使用 make 命令可以快速运行、测试、构建项目
+├── api      # 自动生成的 swagger 文档
+├── assets   # 存点图片等静态资源
+├── build    # CI/CD 相关，包含 docker file, grafana 和 victoriametrics 的配置文件
+├── cmd      # 代码 main 入口
+├── docs     # 详细文档
+├── internal # 项目大部分代码在这里
+├── scripts  # makefile 调用的脚本，包括 docker-compose 和数据库初始化脚本
+└── test
+```
 
 ## Demo 相关背景声明
 
@@ -47,8 +57,10 @@
 
 - 数据量：
 
-	- 总 Services 数量：10 ～ 10000
+	- 总 Service 数量：10 ～ 10000
+	- 总用户数量：1000 以下
 	- 每个用户能够创建的 Service 数量有限，最多创建 10 个 service。
+	- 每个 Service 的版本数量：最多 10 个版本。
 
 - 技术选型：
 
@@ -88,11 +100,22 @@
 
 	```bash
 	# 测试获取服务列表
-	curl -H "Authorization: Bearer dummy_token" http://localhost:8080/v1/services
+	curl -H "Authorization: Bearer dummy_token" http://localhost:8080/api/v1/services
 	
 	# 测试获取特定服务详情
-	curl -H "Authorization: Bearer dummy_token" http://localhost:8080/v1/services/1
+	curl -H "Authorization: Bearer dummy_token" http://localhost:8080/api/v1/services/1
 	```
+
+## 业务建模
+
+define the domain model of an api management platform,
+- include the concept of [user,service,version,api]
+- each service can be created by only one user
+- each service has multiple version
+- each service contains multiple apis, related with specific version
+
+## 架构图
+
 
 ## API 文档
 
