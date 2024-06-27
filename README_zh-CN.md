@@ -3,6 +3,8 @@
 * [English](README.md)
 * [简体中文](README_zh-CN.md)
 
+https://github.com/daymade/catalog-service-management-api/assets/4291901/f30dd4e7-23d6-4a17-a13d-6c644343b7fd
+
 Catalog-Demo 是一个微服务 API 管理平台，用户可以在前端 Dashboard 管理服务和版本。
 
 本项目是 Catalog-Demo 的后端代码，可以从这里启动整个平台，包括后端，前端和监控。
@@ -12,10 +14,15 @@ Demo 包含以下功能：
 - 基于 API Key 的简单认证机制。
 - 支持使用内存和 PostgreSQL 两种存储引擎。
 - 包含测试代码和 swagger 文档。
+- Grafana 监控
 
 Demo 中不包含的功能：
 - 基于角色的授权机制
 - Service 的 CRUD
+
+目前存在的 Bug:
+- 前端的 Service 详情页宽度不对，修复起来比较花时间，所以暂时略过，又不是不能用。
+- Grafana 可以自动导入数据源，但需要手动导入 Dashboard `build/config/grafana/dashboards/Go Metrics-1719497538877.json`
 
 文件目录：
 ```
