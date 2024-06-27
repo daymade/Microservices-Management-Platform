@@ -160,11 +160,13 @@ Define the domain model of an API management platform,
 ### [COLA](https://github.com/alibaba/COLA)-like Layered Architecture
 
 The domain is at the core, with adapters like HTTP API or gRPC in the presentation layer.
+
 <img width="558" alt="image" src="https://github.com/daymade/catalog-service-management-api/assets/4291901/4cc9a67b-5356-40a7-840d-6154c8b3d68c">
 
 ### Service-Related Class Dependency
 
 The app layer depends on the interfaces in the domain layer, and these interfaces are implemented by the infra layer. The app layer is responsible for injecting infra into the domain. The dependency relationship is: app -> domain <- infra.
+
 <img width="558" alt="image" src="https://github.com/daymade/catalog-service-management-api/assets/4291901/4e73e449-1e44-4dfa-a957-a5703b1b8ebb">
 
 ## API Documentation
