@@ -11,6 +11,8 @@ import (
 	"gorm.io/gorm"
 )
 
+const VersionTableName = "Versions"
+
 type PostgresStorage struct {
 	db *gorm.DB
 }
@@ -49,7 +51,7 @@ func (p *PostgresStorage) ListServices(query string, sortBy string, sortDir stri
 	var services []entity.Service
 	var total int64
 
-	db := p.db.Model(&entity.Service{}).Preload("Versions")
+	db := p.db.Model(&entity.Service{}).Preload(VersionTableName)
 
 	if query != "" {
 		// GORM 自动为我们处理了 SQL 参数化
@@ -75,7 +77,7 @@ func (p *PostgresStorage) ListServices(query string, sortBy string, sortDir stri
 
 func (p *PostgresStorage) GetService(id string) (models.Service, error) {
 	var service entity.Service
-	result := p.db.Preload("Versions").First(&service, id)
+	result := p.db.Preload(VersionTableName).First(&service, id)
 	if result.Error != nil {
 		return models.Service{}, result.Error
 	}

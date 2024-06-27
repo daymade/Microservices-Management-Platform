@@ -37,6 +37,7 @@ func NewManager() *Manager {
 }
 
 // ListServices 列出服务
+// Demo 的功能比较简单，所以 app 层比较薄，实际项目中可能会有更多的业务逻辑，比如聚合多个 domain 层的 service
 func (sm *Manager) ListServices(query string, sortBy string, sortDir string, page int, pageSize int) ([]models.Service, int, error) {
 	return sm.service.ListServices(query, sortBy, sortDir, page, pageSize)
 }

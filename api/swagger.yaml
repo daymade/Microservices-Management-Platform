@@ -1,19 +1,104 @@
 basePath: /api/v1
 definitions:
-  viewmodel.Service:
+  viewmodel.PaginatedResponse:
+    description: 分页响应模型，包含分页数据和分页信息
+    properties:
+      data: {}
+      page:
+        example: 1
+        type: integer
+      page_size:
+        example: 20
+        type: integer
+      total_count:
+        example: 100
+        type: integer
+      total_pages:
+        example: 5
+        type: integer
+    type: object
+  viewmodel.ServiceDetailViewModel:
+    description: 服务详情模型，包含服务的详细信息和版本列表
     properties:
       created_at:
+        example: "2023-01-01T00:00:00Z"
         type: string
       description:
+        example: This is a sample service
+        type: string
+      id:
+        example: srv-123
         type: string
       name:
+        example: My Service
         type: string
       owner_id:
+        example: usr-456
         type: string
       updated_at:
+        example: "2023-01-02T00:00:00Z"
+        type: string
+      versions:
+        items:
+          $ref: '#/definitions/viewmodel.VersionViewModel'
+        type: array
+    type: object
+  viewmodel.ServiceListViewModel:
+    description: 服务列表项模型，包含服务的基本信息
+    properties:
+      created_at:
+        example: "2023-01-01T00:00:00Z"
+        type: string
+      description:
+        example: This is a sample service
+        type: string
+      id:
+        example: srv-123
+        type: string
+      name:
+        example: My Service
+        type: string
+      owner_id:
+        example: usr-456
+        type: string
+      updated_at:
+        example: "2023-01-02T00:00:00Z"
         type: string
       version_count:
+        example: 3
         type: integer
+    type: object
+  viewmodel.User:
+    description: 用户信息模型，包含用户的基本信息
+    properties:
+      avatar:
+        example: https://example.com/avatar.jpg
+        type: string
+      created_at:
+        example: "2023-01-01T00:00:00Z"
+        type: string
+      email:
+        example: john@example.com
+        type: string
+      id:
+        example: "1"
+        type: string
+      username:
+        example: John Doe
+        type: string
+    type: object
+  viewmodel.VersionViewModel:
+    description: 版本信息模型，包含版本的基本信息
+    properties:
+      created_at:
+        example: "2023-01-01T00:00:00Z"
+        type: string
+      description:
+        example: Initial release
+        type: string
+      number:
+        example: v1.0.0
+        type: string
     type: object
 host: localhost:8080
 info:
@@ -31,25 +116,25 @@ paths:
     get:
       consumes:
       - application/json
-      description: get string by ID
+      description: 获取服务列表，支持分页、排序和搜索
       parameters:
-      - description: search by q
+      - description: 搜索关键词
         in: query
-        name: q
+        name: query
         type: string
-      - description: sort by field
+      - description: 排序字段
         in: query
         name: sort_by
         type: string
-      - description: sort direction
+      - description: 排序方向 (asc 或 desc)
         in: query
         name: sort_direction
         type: string
-      - description: page number
+      - description: 页码
         in: query
         name: page
         type: integer
-      - description: page size
+      - description: 每页条数
         in: query
         name: page_size
         type: integer
@@ -59,11 +144,87 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/viewmodel.Service'
-      summary: Show an account
+            allOf:
+            - $ref: '#/definitions/viewmodel.PaginatedResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/viewmodel.ServiceListViewModel'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: 列出服务
       tags:
-      - accounts
+      - services
+  /services/{id}:
+    get:
+      consumes:
+      - application/json
+      description: 通过 ID 获取单个服务的详细信息
+      parameters:
+      - description: 服务 ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/viewmodel.ServiceDetailViewModel'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: 获取单个服务
+      tags:
+      - services
+  /user:
+    get:
+      consumes:
+      - application/json
+      description: 返回当前登录用户的详细信息
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/viewmodel.User'
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: 获取当前登录用户
+      tags:
+      - users
 securityDefinitions:
-  BasicAuth:
-    type: basic
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

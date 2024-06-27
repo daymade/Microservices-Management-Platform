@@ -84,6 +84,7 @@ func (m *MemoryStorage) GetService(id string) (models.Service, error) {
 	return service, nil
 }
 
+// 随便找点单词自动生成测试数据
 var (
 	adjectives = []string{"Advanced", "Intelligent", "Secure", "Scalable", "Efficient", "Innovative", "Robust", "Flexible", "Integrated", "Automated"}
 	nouns      = []string{"Analytics", "Database", "Networking", "Messaging", "Authentication", "Monitoring", "Deployment", "Testing", "Backup", "Encryption"}

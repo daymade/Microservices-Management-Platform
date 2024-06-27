@@ -22,7 +22,9 @@ import (
 // @host      localhost:8080
 // @BasePath  /api/v1
 
-// @securityDefinitions.basic  BasicAuth
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
 func main() {
 	http := api.NewHTTPServer()
 

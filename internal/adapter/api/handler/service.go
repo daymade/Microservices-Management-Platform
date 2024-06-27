@@ -19,17 +19,20 @@ func NewServiceHandler(m *service.Manager) *ServiceHandler {
 }
 
 // ListServices godoc
-// @Summary      Show an account
-// @Description  get string by ID
-// @Tags         accounts
+// @Summary      列出服务
+// @Description  获取服务列表，支持分页、排序和搜索
+// @Tags         services
 // @Accept       json
 // @Produce      json
-// @Param        q    query     string  false  "search by q"
-// @Param        sort_by    query     string  false  "sort by field"
-// @Param        sort_direction    query     string  false  "sort direction"
-// @Param        page    query     int  false  "page number"
-// @Param        page_size    query     int  false  "page size"
-// @Success      200  {object}  viewmodel.Service
+// @Security 	 BearerAuth
+// @Param        query           query     string  false  "搜索关键词"
+// @Param        sort_by         query     string  false  "排序字段"
+// @Param        sort_direction  query     string  false  "排序方向 (asc 或 desc)"
+// @Param        page            query     int     false  "页码"
+// @Param        page_size       query     int     false  "每页条数"
+// @Success      200  {object}  viewmodel.PaginatedResponse{data=[]viewmodel.ServiceListViewModel}
+// @Failure      400  {object}  map[string]any
+// @Failure      500  {object}  map[string]any
 // @Router       /services [get]
 func (h *ServiceHandler) ListServices(c *gin.Context) {
 	query := c.DefaultQuery("query", "")
@@ -60,6 +63,18 @@ func (h *ServiceHandler) ListServices(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
+// GetService godoc
+// @Summary      获取单个服务
+// @Description  通过 ID 获取单个服务的详细信息
+// @Tags         services
+// @Accept       json
+// @Produce      json
+// @Security 	 BearerAuth
+// @Param        id   path      string  true  "服务 ID"
+// @Success      200  {object}  viewmodel.ServiceDetailViewModel
+// @Failure      400  {object}  map[string]any
+// @Failure      404  {object}  map[string]any
+// @Router       /services/{id} [get]
 func (h *ServiceHandler) GetService(c *gin.Context) {
 	id := c.Param("id")
 
