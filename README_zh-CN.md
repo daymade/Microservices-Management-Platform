@@ -136,10 +136,6 @@ http://localhost:8080/swagger/index.html
 
 ## 开发人员
 
-我/Claude-3.5-Sonnet/GPT-4o-128k
-
-## 开发人员
-
 ### 我
 <a href="https://github.com/daymade" class="" data-hovercard-type="user" data-hovercard-url="/users/daymade/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self">
   <img src="https://avatars.githubusercontent.com/u/4291901?s=64&amp;v=4" alt="@daymade" width="64" height="64" style="border-radius: 50%; margin-right: 10px;">
@@ -152,5 +148,5 @@ http://localhost:8080/swagger/index.html
 
 ### GPT-4o-128k
 <a href="https://www.openai.com/gpt-4" class="" data-hovercard-type="user" data-hovercard-url="/users/gpt-4/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self">
-  <img src="https://github.com/daymade/catalog-service-management-api/assets/4291901/1bd3390f-4319-44c2-9288-7208e9dc25f8" alt="GPT-4" width="64" height="64" style="border-radius: 50%; margin-right: 10px;">
+  <img src="https://github.com/daymade/catalog-service-management-api/assets/4291901/1bd3390f-4319-44c2-9288-7208e9dc25f8" alt="GPT-4" height="64" style="border-radius: 50%; margin-right: 10px;">
 </a>
