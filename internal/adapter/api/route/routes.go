@@ -27,9 +27,10 @@ func SetupRoutes(r *gin.Engine, sh *handler.ServiceHandler, uh *handler.UserHand
 	v1 := r.Group("/api/v1")
 	v1.Use(middleware.Auth()) // 使用认证中间件
 
+	// 服务相关路由
 	v1.GET("/services", sh.ListServices)
 	v1.GET("/services/:id", sh.GetService)
 
 	// 用户相关路由
-	r.GET("/api/v1/user", uh.GetCurrentUser)
+	v1.GET("/user", uh.GetCurrentUser)
 }
