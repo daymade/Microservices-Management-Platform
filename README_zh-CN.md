@@ -13,7 +13,7 @@ Demo 包含以下功能：
 - Service 的 List 和 Get 接口，支持搜索、过滤、排序、分页、查看详情等功能。
 - 基于 API Key 的简单认证机制。
 - 支持使用内存和 PostgreSQL 两种存储引擎。
-- 包含测试代码和 swagger 文档。
+- 测试代码和 swagger 文档。
 - Grafana 监控
 
 Demo 中不包含的功能：
@@ -102,8 +102,7 @@ Demo 中不包含的功能：
 
    2. 如果选择 PostgreSQL，脚本将在 Docker 中运行数据库。
       1. 选择是否需要重建数据库，脚本会自动完成建表操作，初次运行不需要选择。
-      2. ，并插入一些测试数据。
-      2. 详细请参考文档：使用 PostgreSQL 作为存储引擎
+      2. 详细请参考文档：[使用 PostgreSQL 作为存储引擎](docs/postgresql/Use-PostgreSQL.md)
 
 3. 后端 API 将在 `http://localhost:8080` 上可用。
    1. 前端： `http://localhost:5173`
@@ -135,3 +134,23 @@ define the domain model of an api management platform,
 
 http://localhost:8080/swagger/index.html
 
+## 开发人员
+
+我/Claude-3.5-Sonnet/GPT-4o-128k
+
+## 开发人员
+
+### 我
+<a href="https://github.com/daymade" class="" data-hovercard-type="user" data-hovercard-url="/users/daymade/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self">
+  <img src="https://avatars.githubusercontent.com/u/4291901?s=64&amp;v=4" alt="@daymade" width="64" height="64" style="border-radius: 50%; margin-right: 10px;">
+</a>
+
+### Claude-3.5-Sonnet
+<a href="https://www.anthropic.com/claude" class="" data-hovercard-type="user" data-hovercard-url="/users/claude/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self">
+  <img src="https://www.anthropic.com/_next/image?url=https%3A%2F%2Fcdn.sanity.io%2Fimages%2F4zrzovbb%2Fwebsite%2F1c42a8de70b220fc1737f6e95b3c0373637228db-1319x1512.gif&w=3840&q=75" alt="Claude" width="64" height="64" style="border-radius: 50%; margin-right: 10px;">
+</a>
+
+### GPT-4o-128k
+<a href="https://www.openai.com/gpt-4" class="" data-hovercard-type="user" data-hovercard-url="/users/gpt-4/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self">
+  <img src="https://github.com/daymade/catalog-service-management-api/assets/4291901/1bd3390f-4319-44c2-9288-7208e9dc25f8" alt="GPT-4" width="64" height="64" style="border-radius: 50%; margin-right: 10px;">
+</a>
