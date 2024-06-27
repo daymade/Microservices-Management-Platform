@@ -1,16 +1,21 @@
 # Catalog Service Management API
 
 * [English](README.md)
-* [简体中文](README_zh.md)
+* [简体中文](README_zh-CN.md)
 
-本项目是一个微服务 API 管理平台的后端实现，用户可以在前端 Dashboard 管理服务和版本。
+Catalog-Demo 是一个微服务 API 管理平台，用户可以在前端 Dashboard 管理服务和版本。
 
-项目目前包含以下功能：
+本项目是 Catalog-Demo 的后端代码，可以从这里启动整个平台，包括后端，前端和监控。
+
+Demo 包含以下功能：
 - Service 的 List 和 Get 接口，支持搜索、过滤、排序、分页、查看详情等功能。
-- 基于 API Key 的简单认证机制，基于角色的用户授权机制。
+- 基于 API Key 的简单认证机制。
 - 支持使用内存和 PostgreSQL 两种存储引擎。
-- 包含测试代码
-- 支持 swagger 文档
+- 包含测试代码和 swagger 文档。
+
+Demo 中不包含的功能：
+- 基于角色的授权机制
+- Service 的 CRUD
 
 文件目录：
 ```
@@ -52,21 +57,18 @@
 			- 通过 `services/contact-us` 或者  `services/locate-us` 可以直接跳转到某个 Service 的详情页面。
 
 - 非功能需求：
+  - API 规范：我们设计符合 [Google API 规范](https://google.aip.dev/) 的 API。
+  - 数据量：
 
-	- API 规范：我们设计符合 [Google API 规范](https://google.aip.dev/) 的 API。
-
-- 数据量：
-
-	- 总 Service 数量：10 ～ 10000
-	- 总用户数量：1000 以下
-	- 每个用户能够创建的 Service 数量有限，最多创建 10 个 service。
-	- 每个 Service 的版本数量：最多 10 个版本。
+      - 总 Service 数量：10 ～ 10000
+      - 总用户数量：1000 以下
+      - 每个用户能够创建的 Service 数量有限，最多创建 10 个 service。
+      - 每个 Service 的版本数量：最多 10 个版本。
 
 - 技术选型：
-
-	- 搜索：由于数据量很小，我们不引入搜索引擎，直接在数据库上实现过滤。
-
-
+	- 搜索：由于数据量很小，我们不引入搜索引擎，直接在数据库上实现过滤, 现阶段也不用考虑索引。
+	- 存储引擎：我们支持内存数据库和 PostgreSQL 两种存储引擎，内存数据库用于快速演示，PostgreSQL 可以用于生产环境。
+    - 监控：使用 VictoriaMetrics 和 Grafana 监控服务的性能。
 
 ## 运行环境
 
@@ -82,7 +84,9 @@
     ```bash
     make run-local # 在本机直接运行 go 代码
     # 或者
-	make run-docker # 使用 docker 运行
+	make run-docker # 使用 docker 运行后端和前端
+    # 或者
+    make run-all # 使用 docker 运行后端、前端和监控，使用内存数据库快速演示
     ```
 
 2. 根据提示选择存储引擎（内存数据库或 PostgreSQL）, 
@@ -94,7 +98,10 @@
       2. ，并插入一些测试数据。
       2. 详细请参考文档：使用 PostgreSQL 作为存储引擎
 
-3. 应用程序将在 `http://localhost:8080` 上可用。
+3. 后端 API 将在 `http://localhost:8080` 上可用。
+   1. 前端： `http://localhost:5173`
+   2. Grafana： `http://localhost:3000`，用户 admin 密码 admin
+   3. VictoriaMetrics： `http://localhost:8428`
 
 4. 使用 curl 或 Insomnia 测试端点：
 
@@ -121,7 +128,3 @@ define the domain model of an api management platform,
 
 http://localhost:8080/swagger/index.html
 
-## 开发
-
-make 命令：
-1. build production 会设置变量 `export GIN_MODE=release`
