@@ -1,10 +1,11 @@
 package handler
 
 import (
-	"github.com/gin-gonic/gin"
 	"catalog-service-management-api/internal/app/service"
 	"net/http"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
 )
 
 type ServiceHandler struct {

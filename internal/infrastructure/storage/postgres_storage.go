@@ -2,12 +2,13 @@ package storage
 
 import (
 	"fmt"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 	"catalog-service-management-api/internal/domain/models"
 	"catalog-service-management-api/internal/infrastructure/entity"
 	"log"
 	"os"
+
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 type PostgresStorage struct {
