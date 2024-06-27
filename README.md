@@ -1,213 +1,189 @@
-# Standard Go Project Layout
-
-Translations:
-
-* [한국어 문서](README_ko.md)
-* [简体中文](README_zh.md)
-* [正體中文](README_zh-TW.md)
-* [简体中文](README_zh-CN.md) - ???
-* [Français](README_fr.md)
-* [日本語](README_ja.md)
-* [Português](README_ptBR.md)
-* [Español](README_es.md)
-* [Română](README_ro.md)
-* [Русский](README_ru.md)
-* [Türkçe](README_tr.md)
-* [Italiano](README_it.md)
-* [Vietnamese](README_vi.md)
-* [Українська](README_ua.md)
-* [Indonesian](README_id.md)
-* [हिन्दी](README_hi.md)
-
-## Overview
-
-This is a basic layout for Go application projects. Note that it's basic in terms of content because it's focusing only on the general layout and not what you have inside. It's also basic because it's very high level and it doesn't go into great details in terms of how you can structure your project even further. For example, it doesn't try to cover the project structure you'd have with something like Clean Architecture.
-
-This is **`NOT an official standard defined by the core Go dev team`**. This is a set of common historical and emerging project layout patterns in the Go ecosystem. Some of these patterns are more popular than others. It also has a number of small enhancements along with several supporting directories common to any large enough real world application. Note that the **core Go team provides a great set of general guidelines about structuring Go projects** and what it means for your project when it's imported and when it's installed. See the [`Organizing a Go module`](https://go.dev/doc/modules/layout) page in the official Go docs for more details. It includes the `internal` and `cmd` directory patterns (described below) and other useful information.
-
-**`If you are trying to learn Go or if you are building a PoC or a simple project for yourself this project layout is an overkill. Start with something really simple instead (a single `main.go` file and `go.mod` is more than enough).`** As your project grows keep in mind that it'll be important to make sure your code is well structured otherwise you'll end up with a messy code with lots of hidden dependencies and global state. When you have more people working on the project you'll need even more structure. That's when it's important to introduce a common way to manage packages/libraries. When you have an open source project or when you know other projects import the code from your project repository that's when it's important to have private (aka `internal`) packages and code. Clone the repository, keep what you need and delete everything else! Just because it's there it doesn't mean you have to use it all. None of these patterns are used in every single project. Even the `vendor` pattern is not universal.
-
-With Go 1.14 [`Go Modules`](https://go.dev/wiki/Modules) are finally ready for production. Use [`Go Modules`](https://blog.golang.org/using-go-modules) unless you have a specific reason not to use them and if you do then you don’t need to worry about $GOPATH and where you put your project. The basic `go.mod` file in the repo assumes your project is hosted on GitHub, but it's not a requirement. The module path can be anything though the first module path component should have a dot in its name (the current version of Go doesn't enforce it anymore, but if you are using slightly older versions don't be surprised if your builds fail without it). See Issues [`37554`](https://github.com/golang/go/issues/37554) and [`32819`](https://github.com/golang/go/issues/32819) if you want to know more about it.
-
-This project layout is intentionally generic and it doesn't try to impose a specific Go package structure.
-
-This is a community effort. Open an issue if you see a new pattern or if you think one of the existing patterns needs to be updated.
-
-If you need help with naming, formatting and style start by running [`gofmt`](https://golang.org/cmd/gofmt/) and [`staticcheck`](https://github.com/dominikh/go-tools/tree/master/cmd/staticcheck). The previous standard linter, golint, is now deprecated and not maintained; use of a maintained linter such as staticcheck is recommended. Also make sure to read these Go code style guidelines and recommendations:
-* https://talks.golang.org/2014/names.slide
-* https://golang.org/doc/effective_go.html#names
-* https://blog.golang.org/package-names
-* https://go.dev/wiki/CodeReviewComments
-* [Style guideline for Go packages](https://rakyll.org/style-packages) (rakyll/JBD)
-
-See [`Go Project Layout`](https://medium.com/golang-learn/go-project-layout-e5213cdcfaa2) for additional background information.
-
-More about naming and organizing packages as well as other code structure recommendations:
-* [GopherCon EU 2018: Peter Bourgon - Best Practices for Industrial Programming](https://www.youtube.com/watch?v=PTE4VJIdHPg)
-* [GopherCon Russia 2018: Ashley McNamara + Brian Ketelsen - Go best practices.](https://www.youtube.com/watch?v=MzTcsI6tn-0)
-* [GopherCon 2017: Edward Muller - Go Anti-Patterns](https://www.youtube.com/watch?v=ltqV6pDKZD8)
-* [GopherCon 2018: Kat Zien - How Do You Structure Your Go Apps](https://www.youtube.com/watch?v=oL6JBUk6tj0)
-
-A Chinese post about Package-Oriented-Design guidelines and Architecture layer
-* [面向包的设计和架构分层](https://github.com/danceyoung/paper-code/blob/master/package-oriented-design/packageorienteddesign.md)
-
-## Go Directories
-
-### `/cmd`
-
-Main applications for this project.
-
-The directory name for each application should match the name of the executable you want to have (e.g., `/cmd/myapp`).
-
-Don't put a lot of code in the application directory. If you think the code can be imported and used in other projects, then it should live in the `/pkg` directory. If the code is not reusable or if you don't want others to reuse it, put that code in the `/internal` directory. You'll be surprised what others will do, so be explicit about your intentions!
-
-It's common to have a small `main` function that imports and invokes the code from the `/internal` and `/pkg` directories and nothing else.
-
-See the [`/cmd`](cmd/README.md) directory for examples.
-
-### `/internal`
-
-Private application and library code. This is the code you don't want others importing in their applications or libraries. Note that this layout pattern is enforced by the Go compiler itself. See the Go 1.4 [`release notes`](https://golang.org/doc/go1.4#internalpackages) for more details. Note that you are not limited to the top level `internal` directory. You can have more than one `internal` directory at any level of your project tree.
-
-You can optionally add a bit of extra structure to your internal packages to separate your shared and non-shared internal code. It's not required (especially for smaller projects), but it's nice to have visual clues showing the intended package use. Your actual application code can go in the `/internal/app` directory (e.g., `/internal/app/myapp`) and the code shared by those apps in the `/internal/pkg` directory (e.g., `/internal/pkg/myprivlib`).
-
-### `/pkg`
-
-Library code that's ok to use by external applications (e.g., `/pkg/mypubliclib`). Other projects will import these libraries expecting them to work, so think twice before you put something here :-) Note that the `internal` directory is a better way to ensure your private packages are not importable because it's enforced by Go. The `/pkg` directory is still a good way to explicitly communicate that the code in that directory is safe for use by others. The [`I'll take pkg over internal`](https://travisjeffery.com/b/2019/11/i-ll-take-pkg-over-internal/) blog post by Travis Jeffery provides a good overview of the `pkg` and `internal` directories and when it might make sense to use them.
-
-It's also a way to group Go code in one place when your root directory contains lots of non-Go components and directories making it easier to run various Go tools (as mentioned in these talks: [`Best Practices for Industrial Programming`](https://www.youtube.com/watch?v=PTE4VJIdHPg) from GopherCon EU 2018, [GopherCon 2018: Kat Zien - How Do You Structure Your Go Apps](https://www.youtube.com/watch?v=oL6JBUk6tj0) and [GoLab 2018 - Massimiliano Pippi - Project layout patterns in Go](https://www.youtube.com/watch?v=3gQa1LWwuzk)).
-
-See the [`/pkg`](pkg/README.md) directory if you want to see which popular Go repos use this project layout pattern. This is a common layout pattern, but it's not universally accepted and some in the Go community don't recommend it.
-
-It's ok not to use it if your app project is really small and where an extra level of nesting doesn't add much value (unless you really want to :-)). Think about it when it's getting big enough and your root directory gets pretty busy (especially if you have a lot of non-Go app components).
-
-The `pkg` directory origins: The old Go source code used to use `pkg` for its packages and then various Go projects in the community started copying the pattern (see [`this`](https://twitter.com/bradfitz/status/1039512487538970624) Brad Fitzpatrick's tweet for more context).
-
-### `/vendor`
-
-Application dependencies (managed manually or by your favorite dependency management tool like the new built-in [`Go Modules`](https://go.dev/wiki/Modules) feature). The `go mod vendor` command will create the `/vendor` directory for you. Note that you might need to add the `-mod=vendor` flag to your `go build` command if you are not using Go 1.14 where it's on by default.
-
-Don't commit your application dependencies if you are building a library.
-
-Note that since [`1.13`](https://golang.org/doc/go1.13#modules) Go also enabled the module proxy feature (using [`https://proxy.golang.org`](https://proxy.golang.org) as their module proxy server by default). Read more about it [`here`](https://blog.golang.org/module-mirror-launch) to see if it fits all of your requirements and constraints. If it does, then you won't need the `vendor` directory at all.
-
-## Service Application Directories
-
-### `/api`
-
-OpenAPI/Swagger specs, JSON schema files, protocol definition files.
-
-See the [`/api`](api/README.md) directory for examples.
-
-## Web Application Directories
-
-### `/web`
-
-Web application specific components: static web assets, server side templates and SPAs.
-
-## Common Application Directories
-
-### `/configs`
-
-Configuration file templates or default configs.
-
-Put your `confd` or `consul-template` template files here.
-
-### `/init`
-
-System init (systemd, upstart, sysv) and process manager/supervisor (runit, supervisord) configs.
-
-### `/scripts`
-
-Scripts to perform various build, install, analysis, etc operations.
-
-These scripts keep the root level Makefile small and simple (e.g., [`https://github.com/hashicorp/terraform/blob/main/Makefile`](https://github.com/hashicorp/terraform/blob/main/Makefile)).
-
-See the [`/scripts`](scripts/README.md) directory for examples.
-
-### `/build`
-
-Packaging and Continuous Integration.
-
-Put your cloud (AMI), container (Docker), OS (deb, rpm, pkg) package configurations and scripts in the `/build/package` directory.
-
-Put your CI (travis, circle, drone) configurations and scripts in the `/build/ci` directory. Note that some of the CI tools (e.g., Travis CI) are very picky about the location of their config files. Try putting the config files in the `/build/ci` directory linking them to the location where the CI tools expect them (when possible).
-
-### `/deployments`
-
-IaaS, PaaS, system and container orchestration deployment configurations and templates (docker-compose, kubernetes/helm, terraform). Note that in some repos (especially apps deployed with kubernetes) this directory is called `/deploy`.
-
-### `/test`
-
-Additional external test apps and test data. Feel free to structure the `/test` directory anyway you want. For bigger projects it makes sense to have a data subdirectory. For example, you can have `/test/data` or `/test/testdata` if you need Go to ignore what's in that directory. Note that Go will also ignore directories or files that begin with "." or "_", so you have more flexibility in terms of how you name your test data directory.
-
-See the [`/test`](test/README.md) directory for examples.
-
-## Other Directories
-
-### `/docs`
-
-Design and user documents (in addition to your godoc generated documentation).
-
-See the [`/docs`](docs/README.md) directory for examples.
-
-### `/tools`
-
-Supporting tools for this project. Note that these tools can import code from the `/pkg` and `/internal` directories.
-
-See the [`/tools`](tools/README.md) directory for examples.
-
-### `/examples`
-
-Examples for your applications and/or public libraries.
-
-See the [`/examples`](examples/README.md) directory for examples.
-
-### `/third_party`
-
-External helper tools, forked code and other 3rd party utilities (e.g., Swagger UI).
-
-### `/githooks`
-
-Git hooks.
-
-### `/assets`
-
-Other assets to go along with your repository (images, logos, etc).
-
-### `/website`
-
-This is the place to put your project's website data if you are not using GitHub pages.
-
-See the [`/website`](website/README.md) directory for examples.
-
-## Directories You Shouldn't Have
-
-### `/src`
-
-Some Go projects do have a `src` folder, but it usually happens when the devs came from the Java world where it's a common pattern. If you can help yourself try not to adopt this Java pattern. You really don't want your Go code or Go projects to look like Java :-)
-
-Don't confuse the project level `/src` directory with the `/src` directory Go uses for its workspaces as described in [`How to Write Go Code`](https://golang.org/doc/code.html). The `$GOPATH` environment variable points to your (current) workspace (by default it points to `$HOME/go` on non-windows systems). This workspace includes the top level `/pkg`, `/bin` and `/src` directories. Your actual project ends up being a sub-directory under `/src`, so if you have the `/src` directory in your project the project path will look like this: `/some/path/to/workspace/src/your_project/src/your_code.go`. Note that with Go 1.11 it's possible to have your project outside of your `GOPATH`, but it still doesn't mean it's a good idea to use this layout pattern.
-
-
-## Badges
-
-* [Go Report Card](https://goreportcard.com/) - It will scan your code with `gofmt`, `go vet`, `gocyclo`, `golint`, `ineffassign`, `license` and `misspell`. Replace `github.com/golang-standards/project-layout` with your project reference.
-
-    [![Go Report Card](https://goreportcard.com/badge/github.com/golang-standards/project-layout?style=flat-square)](https://goreportcard.com/report/github.com/golang-standards/project-layout)
-
-* ~~[GoDoc](http://godoc.org) - It will provide online version of your GoDoc generated documentation. Change the link to point to your project.~~
-
-    [![Go Doc](https://img.shields.io/badge/godoc-reference-blue.svg?style=flat-square)](http://godoc.org/github.com/golang-standards/project-layout)
-
-* [Pkg.go.dev](https://pkg.go.dev) - Pkg.go.dev is a new destination for Go discovery & docs. You can create a badge using the [badge generation tool](https://pkg.go.dev/badge).
-
-    [![PkgGoDev](https://pkg.go.dev/badge/github.com/golang-standards/project-layout)](https://pkg.go.dev/github.com/golang-standards/project-layout)
-
-* Release - It will show the latest release number for your project. Change the github link to point to your project.
-
-    [![Release](https://img.shields.io/github/release/golang-standards/project-layout.svg?style=flat-square)](https://github.com/golang-standards/project-layout/releases/latest)
-
-## Notes
-
-A more opinionated project template with sample/reusable configs, scripts and code is a WIP.
+# Catalog Service Management API
+
+* [English](README.md)
+* [简体中文](README_zh-CN.md)
+
+https://github.com/daymade/catalog-service-management-api/assets/4291901/f30dd4e7-23d6-4a17-a13d-6c644343b7fd
+
+Catalog-Demo is a microservices API management platform that allows users to manage services and versions through a frontend dashboard.
+
+This project is the backend code for Catalog-Demo. You can use it to start the entire platform, including the backend, frontend, and monitoring.
+
+The demo includes the following features:
+- List and Get APIs for services, supporting search, filter, sort, pagination, and detailed view.
+- Simple authentication mechanism based on API Key.
+- Support for both in-memory and PostgreSQL storage engines.
+- Test code and swagger documentation.
+- Grafana monitoring.
+
+The demo does not include:
+- Role-based authorization mechanism.
+- CRUD operations for services.
+
+Known bugs:
+- The width of the service detail page on the frontend is incorrect. Fixing it requires significant effort, so it is temporarily skipped as it is still usable.
+- Grafana can automatically import data sources but requires manual import of the Dashboard: `build/config/grafana/dashboards/Go Metrics-1719497538877.json`.
+
+Directory structure:
+```
+.
+├── Makefile          # Makefile for the project, use `make` to quickly run, test, build the project
+├── api               # Auto-generated swagger documentation
+├── assets            # Store images and other static resources
+├── build             # CI/CD related, including Dockerfile, Grafana, and VictoriaMetrics configuration files
+├── cmd               # Main entry point of the code
+├── docs              # Detailed documentation
+├── internal          # Most of the project code resides here
+├── scripts           # Scripts called by Makefile, including docker-compose and database initialization scripts
+└── test
+```
+
+## Demo Background Declaration
+
+> In actual project development, we need to communicate back and forth with product managers, designers, and business operators to confirm details that were not fully determined in the initial product documentation. Due to the special nature of this project, I have made some simplified assumptions for usage scenarios, solely to reduce communication overhead with the interviewer.
+
+Assumptions:
+
+- **Business Definition**:
+  - Each service is assumed to be a backend API project containing a set of APIs.
+  - **Version Management**: Services are managed at the service level, not the API level. For example, `/v1` of a service may contain 10 APIs, while `/v2` may contain 12 APIs. Versioning can follow any semantic versioning rules, like `v1`, `v2`, or even `v2024-06-26` as seen in Google Cloud APIs.
+  - **Multi-tenant**: We design only the core Service Cards without cross-region and multi-tenant designs like Region or Tenant.
+  - **Access Control**: Users can see their own projects and **also** see others' projects. Implementing user-based project filtering is not within the scope of this phase.
+
+- **Functional Requirements**:
+  - **Search**: Users can search for a specific service by name and description.
+  - **Filter**: Users can filter services by name and description.
+  - **Sort**: Users can sort services by name and creation time.
+  - **Pagination**: Due to the small data volume, support for jumping to a specific page is not required; only previous and next page navigation is needed.
+  - **View Details**: Users can view service details, including versions and API lists.
+  - **Developer Experience**:
+    - **UI**: The URL should be structured, allowing navigation to any intermediate page, such as:
+      - `services` is the list page, and if a filter is applied, it becomes `services?query=name`.
+      - Navigating to `services/contact-us` or `services/locate-us` should directly take the user to the details page of a specific service.
+
+- **Non-functional Requirements**:
+  - **API Standards**: APIs are designed to conform to [Google API Standards](https://google.aip.dev/).
+  - **Data Volume**:
+    - Total number of services: 10 - 10,000
+    - Total number of users: fewer than 1,000
+    - Each user can create a maximum of 10 services.
+    - Each service can have up to 10 versions.
+
+- **Technology Stack**:
+  - **Search**: Due to the small data volume, we do not introduce a search engine and instead implement filtering directly in the database.
+  - **Storage Engine**: Support for both in-memory and PostgreSQL storage engines. In-memory is used for fast demonstrations, while PostgreSQL is for production environments.
+  - **Database Structure**: In internet architecture, foreign keys are generally not used. Given the small data volume, foreign keys do not impact performance and are used.
+  - **Monitoring**: Use VictoriaMetrics and Grafana for performance monitoring.
+
+## Runtime Environment
+
+- Go 1.22 or higher
+- Docker and Docker Compose (required when using PostgreSQL; not needed for in-memory database)
+
+## Quick Start
+
+### Run
+
+1. Choose one of the following commands:
+
+    ```bash
+    make run-local  # Run Go code directly on the local machine
+    # Or
+    make run-docker  # Run backend and frontend using Docker
+    # Or
+    make run-all  # Run backend, frontend, and monitoring using Docker, with in-memory database for quick demonstration
+    ```
+
+2. Follow the prompts to choose a storage engine (in-memory database or PostgreSQL):
+
+   1. If using the in-memory database, proceed to step 3.
+   2. If using PostgreSQL, the script will run the database in Docker.
+      1. Choose whether to rebuild the database. The script will handle table creation automatically. No need to choose for initial runs.
+      2. Refer to the documentation for details: [Using PostgreSQL as a Storage Engine](docs/postgresql/Use-PostgreSQL.md)
+
+3. The backend API will be available at `http://localhost:8080`.
+   - Frontend: `http://localhost:5173`
+   - Grafana: `http://localhost:3000`, user: admin, password: admin
+   - VictoriaMetrics: `http://localhost:8428`
+
+4. Test endpoints using curl or Insomnia:
+
+    ```bash
+    # Test fetching the service list
+    curl -H "Authorization: Bearer dummy_token" http://localhost:8080/api/v1/services
+
+    # Test fetching specific service details
+    curl -H "Authorization: Bearer dummy_token" http://localhost:8080/api/v1/services/1
+    ```
+
+## Domain Modeling
+```
++-------------------+           +-------------------+
+|       User        |           |     Service       |
++-------------------+           +-------------------+
+| - id: int         |1         *| - id: int         |
+| - name: string    +-----------| - name: string    |
+| - email: string   |           | - description: string |
++-------------------+           | - userId: int     |
+                                +-------------------+
+                                      |1
+                                      |
+                                      |*
+                                +-------------------+
+                                |     Version       |
+                                +-------------------+
+                                | - id: int         |
+                                | - version: string |
+                                | - serviceId: int  |
+                                +-------------------+
+                                      |1
+                                      |
+                                      |*
+                                +-------------------+
+                                |       API         |
+                                +-------------------+
+                                | - id: int         |
+                                | - name: string    |
+                                | - path: string    |
+                                | - method: string  |
+                                | - versionId: int  |
+                                +-------------------+
+```
+Define the domain model of an API management platform,
+- Include the concept of [user, service, version, API].
+- Each service can be created by only one user.
+- Each service has multiple versions.
+- Each service contains multiple APIs, related to specific versions.
+
+## Architecture Diagram
+
+### [COLA](https://github.com/alibaba/COLA)-like Layered Architecture
+
+The domain is at the core, with adapters like HTTP API or gRPC in the presentation layer.
+<img width="558" alt="image" src="https://github.com/daymade/catalog-service-management-api/assets/4291901/4cc9a67b-5356-40a7-840d-6154c8b3d68c">
+
+### Service-Related Class Dependency
+
+The app layer depends on the interfaces in the domain layer, and these interfaces are implemented by the infra layer. The app layer is responsible for injecting infra into the domain. The dependency relationship is: app -> domain <- infra.
+<img width="558" alt="image" src="https://github.com/daymade/catalog-service-management-api/assets/4291901/4e73e449-1e44-4dfa-a957-a5703b1b8ebb">
+
+## API Documentation
+
+http://localhost:8080/swagger/index.html
+
+## Developer(s)
+
+### Me
+<a href="https://github.com/daymade" class="" data-hovercard-type="user" data-hovercard-url="/users/daymade/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self">
+  <img src="https://avatars.githubusercontent.com/u/4291901?s=64&amp;v=4" alt="@daymade" width="64" height="64" style="border-radius: 50%; margin-right: 10px;">
+</a>
+
+### Claude-3.5-Sonnet
+<a href="https://www.anthropic.com/claude" class="" data-hovercard-type="user" data-hovercard-url="/users/claude/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self">
+  <img src="https://www.anthropic.com/_next/image?url=https%3A%2F%2Fcdn.sanity.io%2Fimages%2F4zrzovbb%2Fwebsite%2F1c42a8de70b220fc1737f6e95b3c0373637228db-1319x1512.gif&w=3840&q=75" alt="Claude" width="64" height="64" style="border-radius: 50%; margin-right: 10px;">
+</a>
+
+### GPT-4o-128k
+<a href="https://www.openai.com/gpt-4" class="" data-hovercard-type="user" data-hovercard-url="/users/gpt-4/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self">
+  <img src="https://github.com/daymade/catalog-service-management-api/assets/4291901/1bd3390f-4319-44c2-9288-7208e9dc25f8" alt="GPT-4" height="64" style="border-radius: 50%; margin-right: 10px;">
+</a>

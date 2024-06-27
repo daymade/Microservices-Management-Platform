@@ -160,7 +160,7 @@ define the domain model of an api management platform,
 
 ## 架构图
 
-### 类似 COLA 的分层架构
+### 类似 [COLA](https://github.com/alibaba/COLA) 的分层架构
 
 以 domain 为核心，在表现层可以有 http api 或 grpc 等不同协议的 adapter。
 <img width="566" alt="image" src="https://github.com/daymade/catalog-service-management-api/assets/4291901/4cc9a67b-5356-40a7-840d-6154c8b3d68c">
@@ -168,8 +168,7 @@ define the domain model of an api management platform,
 ### 和 Service 相关的类依赖关系
 
 app 层依赖 domain 层的接口，domain 的接口由 infra 层实现，app 负责注入 infra 到 domain，依赖关系为：app -> domain <- infra。
-<img width="561" alt="image" src="https://github.com/daymade/catalog-service-management-api/assets/4291901/071b00b9-4859-4552-9411-68ea64ad3815">
-
+<img width="558" alt="image" src="https://github.com/daymade/catalog-service-management-api/assets/4291901/4e73e449-1e44-4dfa-a957-a5703b1b8ebb">
 
 ## API 文档
 
