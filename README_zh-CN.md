@@ -1,20 +1,22 @@
-# Catalog Service Management API
+# Service Catalog Demo
 
 * [English](README.md)
 * [简体中文](README_zh-CN.md)
 
 https://github.com/daymade/catalog-service-management-api/assets/4291901/f30dd4e7-23d6-4a17-a13d-6c644343b7fd
 
-Catalog-Demo 是一个微服务 API 管理平台，用户可以在前端 Dashboard 管理服务和版本。
+Service Catalog Demo 是一个微服务 API 管理平台，用户可以在前端 Dashboard 管理服务和版本。
 
-本项目是 Catalog-Demo 的后端代码，可以从这里启动整个平台，包括后端，前端和监控。
+本项目是 Service Catalog Demo 的后端代码，可以从这里启动整个平台，包括后端，前端和监控。
 
 Demo 包含以下功能：
-- Service 的 List 和 Get 接口，支持搜索、过滤、排序、分页、查看详情等功能。
-- 基于 API Key 的简单认证机制。
-- 支持使用内存和 PostgreSQL 两种存储引擎。
-- 测试代码和 swagger 文档。
-- Grafana 监控
+- Service 的 List 和 Get 接口，支持搜索、过滤、排序、分页、查看详情等功能
+- 基于 API Key 的简单认证机制
+- 支持使用内存和 PostgreSQL 两种存储引擎
+- 使用 makefile 生成测试覆盖率报告，生成 swagger 文档
+- 使用 docker compose 启动后端、前端和监控
+  - 支持使用 Grafana 监控 Golang Metrics 和 HTTP API，内置了两个监控 dashboard
+  - 集成了 Open Telemetry 和 Jaeger 分布式追踪
 
 Demo 中不包含的功能：
 - 基于角色的授权机制
@@ -32,33 +34,33 @@ Demo 中不包含的功能：
 ├── docs     # 详细文档
 ├── internal # 项目大部分代码在这里
 ├── scripts  # makefile 调用的脚本，包括 docker-compose 和数据库初始化脚本
-└── test
+└── test	 # 存放测试数据
 ```
 
 ## Demo 相关背景声明
 
-> 在实际的项目开发中，我们需要就产品细节跟产品经理、设计师、业务运营人员来回沟通，确定产品文档中未能在第一次描述时全部确定的细节，由于项目特殊，我这里简单的假设了一些使用场景，这只是为了减少和面试官中间的沟通损耗。
+> 在实际的项目开发中，我们需要就产品细节跟产品经理、设计师、业务运营人员来回沟通，
+> 确定在第一版产品文档 PDF 中未能全部确定的细节，
+> 由于项目特殊，我这里简单的假设了一些使用场景，这只是为了减少和面试官中间的沟通损耗。
 
 我们有以下假设：
 
 - 业务定义：
-
 	- 业务我们假设每个 Service 都是一个后端 API 项目，包含了一系列 API 集合
 	- 版本管理：Service 有版本管理，版本管理的力度在 Service 级别而不是 API 级别，比如 `/v1` 的 Service 可能包含 10个 API，`/v2` 的Service 可能包含 12 个 API。版本号的规则 `v1` 、`v2`，但可以是任何符合语义化版本的值，我们知道 Google Cloud 的 API 是 `v2024-06-26` 这样。
 	- 多租户：只设计最核心的 Service Cards，不需要进行跨区域和多租户设计，比如 Region、Tanent。
 	- 权限控制：用户能看到自己的项目，**也可以**看到其他人的项目，实现用户维度的项目过滤不在这一期的考虑范围内。
 
 - 功能需求：
-
-	- 搜索：用户可以通过名字和描述搜索指定 Service
-	- 过滤：用户只能通过 Service 的名字和描述进行过滤
+	- 搜索过滤：用户可以通过名字和描述搜索指定 Service，不支持其他字段
 	- 排序：用户可以通过名字和创建时间进行排序
 	- 分页：由于数据量很小，所以可以支持跳转到指定页，否则只需要支持上一页和下一页
-	- 查看详情：用户可以查看 Service 的详情，包括版本、API 列表等
+	- 查看详情：用户可以查看 Service 的详情，包括版本列表、API 列表等
 	- 开发者体验：
-		- UI: 需要支持 url 规则化，能通过 Uri 跳转到任何中间页面，例如：
-			- `services` 是列表页面，如果输入了过滤条件则是 `services?query=name` 。
-			- 通过 `services/contact-us` 或者  `services/locate-us` 可以直接跳转到某个 Service 的详情页面。
+		- UI: 需要支持 url 规则化，能通过 url 跳转到任何中间页面，例如：
+			- `services` 是列表页面，如果输入了过滤条件需要联动 url 变为 `services?query=name`。
+			- `services/12` 可以直接跳转到某个 Service 的详情页面。
+        - API: 需要支持 Swagger 文档，方便开发者查看接口文档。
 
 - 非功能需求：
 	- API 规范：我们设计符合 [Google API 规范](https://google.aip.dev/) 的 API。
@@ -67,12 +69,16 @@ Demo 中不包含的功能：
 		- 总用户数量：1000 以下
 		- 每个用户能够创建的 Service 数量有限，最多创建 10 个 service。
 		- 每个 Service 的版本数量：最多 10 个版本。
+    - 监控，我们需要监控后端服务的性能，包括：
+		- HTTP API 的 QPS、延迟、错误率
+		- Golang Metrics：内存、CPU、Goroutine 数量等
+		- 分布式追踪：我们需要追踪每个请求的链路，包括 HTTP 请求、数据库查询等
 
 - 技术选型：
-	- 搜索：由于数据量很小，我们不引入搜索引擎，直接在数据库上实现过滤, 现阶段也不用考虑索引。
+	- 搜索：由于数据量很小，我们不引入搜索引擎，直接在数据库上实现过滤, 现阶段也不用考虑索引优化。
 	- 存储引擎：我们支持内存数据库和 PostgreSQL 两种存储引擎，内存数据库用于快速演示，PostgreSQL 可以用于生产环境。
-	- 数据库结构：互联网架构中一般不会使用外键，这个数据量很小，外键不会影响性能，所以用了外键。
-	- 监控：使用 VictoriaMetrics 和 Grafana 监控服务的性能。
+	- 数据库结构：互联网架构中一般不会使用外键，这个场景的数据量很小，外键不会影响太多性能，所以用了外键。
+	- 监控：使用 VictoriaMetrics 和 Grafana 监控服务的性能，OpenTelemetry 和 Jaeger 进行分布式追踪。
 
 ## 运行环境
 
@@ -137,7 +143,7 @@ Demo 中不包含的功能：
 +-------------------+           +-------------------+
 | - id: int         |1         *| - id: int         |
 | - name: string    +-----------| - name: string    |
-| - email: string   |           | - description: string |
+| - email: string   |           | - description: str|
 +-------------------+           | - userId: int     |
                                 +-------------------+
                                       |1
