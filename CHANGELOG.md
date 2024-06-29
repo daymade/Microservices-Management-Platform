@@ -1,3 +1,9 @@
+## 0.1.1 (2024-06-29)
+
+### Fix
+
+- **ci**: remove unnecessary folder copy when build image for backend
+
 ## 0.1.0 (2024-06-29)
 
 ### Feat
