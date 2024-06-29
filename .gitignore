@@ -206,3 +206,5 @@ $RECYCLE.BIN/
 
 # End of https://www.toptal.com/developers/gitignore/api/goland+all,macos,windows,linux,visualstudiocode
 /build/frontend/catalog-service-management-ui/
+coverage.out
+coverage.html
