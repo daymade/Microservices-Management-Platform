@@ -1,6 +1,8 @@
 package service
 
 import (
+	"fmt"
+	"catalog-service-management-api/internal/app/util/version"
 	"catalog-service-management-api/internal/domain"
 	"catalog-service-management-api/internal/domain/models"
 	"catalog-service-management-api/internal/infrastructure/storage"
@@ -39,16 +41,41 @@ func NewManager() *Manager {
 // ListServices 列出服务
 // Demo 的功能比较简单，所以 app 层比较薄，实际项目中可能会有更多的业务逻辑，比如聚合多个 domain 层的 service
 func (sm *Manager) ListServices(query string, sortBy string, sortDir string, page int, pageSize int) ([]models.Service, int, error) {
-	return sm.service.ListServices(query, sortBy, sortDir, page, pageSize)
+	services, total, err := sm.service.ListServices(query, sortBy, sortDir, page, pageSize)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	// 对每个服务的版本进行排序
+	for i := range services {
+		services[i].Versions = version.Sort(services[i].Versions)
+	}
+
+	return services, total, nil
 }
 
 // GetService 获取单个服务
 func (sm *Manager) GetService(id string) (models.Service, error) {
-	return sm.service.GetService(id)
+	service, err := sm.service.GetService(id)
+	if err != nil {
+		return models.Service{}, err
+	}
+
+	// 对服务的版本进行排序
+	service.Versions = version.Sort(service.Versions)
+
+	return service, nil
 }
 
 // GetVersions 获取服务版本
 func (sm *Manager) GetVersions(id string) ([]models.Version, error) {
-	// 实现获取服务版本的逻辑
-	return nil, nil
+	service, err := sm.service.GetService(id)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get service: %w", err)
+	}
+
+	// 排序
+	versions := version.Sort(service.Versions)
+
+	return versions, nil
 }

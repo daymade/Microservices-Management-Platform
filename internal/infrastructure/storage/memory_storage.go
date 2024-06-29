@@ -18,17 +18,20 @@ type MemoryStorage struct {
 func NewMemoryStorage() *MemoryStorage {
 	storage := &MemoryStorage{
 		services: make(map[string]models.Service),
+		mutex:    sync.RWMutex{},
 	}
 
-	// 随机填充一些测试数据
-	count := 25
-	rand.Seed(time.Now().UnixNano())
+	if len(storage.services) == 0 {
+		// 随机填充一些测试数据
+		count := 25
+		rand.Seed(time.Now().UnixNano())
 
-	baseTime := time.Now().Add(-365 * 24 * time.Hour) // Start from one year ago
-	for i := 1; i <= count; i++ {
-		id := fmt.Sprintf("%d", i)
-		storage.services[id] = generateRandomService(id, baseTime)
-		baseTime = baseTime.Add(time.Duration(rand.Intn(24)) * time.Hour) // Add up to 24 hours
+		baseTime := time.Now().Add(-365 * 24 * time.Hour) // Start from one year ago
+		for i := 1; i <= count; i++ {
+			id := fmt.Sprintf("%d", i)
+			storage.services[id] = generateRandomService(id, baseTime)
+			baseTime = baseTime.Add(time.Duration(rand.Intn(24)) * time.Hour) // Add up to 24 hours
+		}
 	}
 
 	return storage
@@ -38,24 +41,37 @@ func (m *MemoryStorage) ListServices(query string, sortBy string, sortDir string
 	m.mutex.RLock()
 	defer m.mutex.RUnlock()
 
+	// 过滤
 	var filteredServices []models.Service
 	for _, service := range m.services {
-		if query == "" || strings.Contains(strings.ToLower(service.Name), strings.ToLower(query)) || strings.Contains(strings.ToLower(service.Description), strings.ToLower(query)) {
+		if query == "" ||
+			strings.Contains(strings.ToLower(service.Name), strings.ToLower(query)) ||
+			strings.Contains(strings.ToLower(service.Description), strings.ToLower(query)) {
 			filteredServices = append(filteredServices, service)
 		}
 	}
 
-	// 排序
-	if sortBy == "name" {
-		if sortDir == "asc" {
-			sort.Slice(filteredServices, func(i, j int) bool {
+	// 排序（每个 Service 的 Version 排序在 domain/app 层处理）
+	switch sortBy {
+	case "name":
+		sort.Slice(filteredServices, func(i, j int) bool {
+			if sortDir == "asc" {
 				return filteredServices[i].Name < filteredServices[j].Name
-			})
-		} else {
-			sort.Slice(filteredServices, func(i, j int) bool {
-				return filteredServices[i].Name > filteredServices[j].Name
-			})
-		}
+			}
+			return filteredServices[i].Name > filteredServices[j].Name
+		})
+	case "created_at":
+		sort.Slice(filteredServices, func(i, j int) bool {
+			if sortDir == "asc" {
+				return filteredServices[i].CreatedAt.Before(filteredServices[j].CreatedAt)
+			}
+			return filteredServices[i].CreatedAt.After(filteredServices[j].CreatedAt)
+		})
+	default:
+		// 默认按创建时间降序排序
+		sort.Slice(filteredServices, func(i, j int) bool {
+			return filteredServices[i].CreatedAt.After(filteredServices[j].CreatedAt)
+		})
 	}
 
 	// 分页
