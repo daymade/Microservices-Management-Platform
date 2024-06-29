@@ -12,7 +12,6 @@ COPY --from=deps /go/pkg /go/pkg
 COPY api/ ./api/
 COPY cmd/ ./cmd/
 COPY internal/ ./internal/
-COPY vendor/ ./vendor/
 COPY go.mod go.sum ./
 # 如果 assets 文件夹包含构建所需的资源，也复制它
 COPY assets/ ./assets/
