@@ -1,16 +1,10 @@
 #!/bin/bash
 
-set -e
-
-log() {
-  echo "[`date +"%Y-%m-%d %H:%M:%S"`] $1"
-}
+source scripts/base.sh
 
 export COMPOSE_PROJECT_NAME=catalog-service-management-api
 
-# 使用内存数据库
-log "简化 Demo 使用内存数据库"
-export USE_DB=false
+setup_storage
 
 # 检查并克隆前端项目
 FRONTEND_DIR="build/frontend/catalog-service-management-ui"
@@ -28,4 +22,4 @@ cd -
 # 启动 Docker Compose
 log "使用 Docker Compose 启动所有服务..."
 trap 'log "docker-compose 已被用户手动停止。"; exit 0' SIGINT SIGTERM
-docker-compose -f build/docker-compose-all.yml up --build
+docker-compose -f build/docker-compose.yml up --build

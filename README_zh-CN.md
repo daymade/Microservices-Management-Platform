@@ -20,11 +20,8 @@ Demo 中不包含的功能：
 - 基于角色的授权机制
 - Service 的 CRUD
 
-目前存在的 Bug:
-- 前端的 Service 详情页宽度不对，修复起来比较花时间，所以暂时略过，又不是不能用。
-- Grafana 可以自动导入数据源，但需要手动导入 Dashboard `build/config/grafana/dashboards/Go Metrics-1719497538877.json`
+## 文件目录：
 
-文件目录：
 ```
 .
 ├── Makefile # 项目的 makefile 文件，使用 make 命令可以快速运行、测试、构建项目
@@ -54,28 +51,28 @@ Demo 中不包含的功能：
 - 功能需求：
 
 	- 搜索：用户可以通过名字和描述搜索指定 Service
-    - 过滤：用户只能通过 Service 的名字和描述进行过滤
-    - 排序：用户可以通过名字和创建时间进行排序
-    - 分页：由于数据量很小，所以可以支持跳转到指定页，否则只需要支持上一页和下一页
-    - 查看详情：用户可以查看 Service 的详情，包括版本、API 列表等
+	- 过滤：用户只能通过 Service 的名字和描述进行过滤
+	- 排序：用户可以通过名字和创建时间进行排序
+	- 分页：由于数据量很小，所以可以支持跳转到指定页，否则只需要支持上一页和下一页
+	- 查看详情：用户可以查看 Service 的详情，包括版本、API 列表等
 	- 开发者体验：
 		- UI: 需要支持 url 规则化，能通过 Uri 跳转到任何中间页面，例如：
 			- `services` 是列表页面，如果输入了过滤条件则是 `services?query=name` 。
 			- 通过 `services/contact-us` 或者  `services/locate-us` 可以直接跳转到某个 Service 的详情页面。
 
 - 非功能需求：
-  - API 规范：我们设计符合 [Google API 规范](https://google.aip.dev/) 的 API。
-  - 数据量：
-      - 总 Service 数量：10 ～ 10000
-      - 总用户数量：1000 以下
-      - 每个用户能够创建的 Service 数量有限，最多创建 10 个 service。
-      - 每个 Service 的版本数量：最多 10 个版本。
+	- API 规范：我们设计符合 [Google API 规范](https://google.aip.dev/) 的 API。
+	- 数据量：
+		- 总 Service 数量：10 ～ 10000
+		- 总用户数量：1000 以下
+		- 每个用户能够创建的 Service 数量有限，最多创建 10 个 service。
+		- 每个 Service 的版本数量：最多 10 个版本。
 
 - 技术选型：
 	- 搜索：由于数据量很小，我们不引入搜索引擎，直接在数据库上实现过滤, 现阶段也不用考虑索引。
 	- 存储引擎：我们支持内存数据库和 PostgreSQL 两种存储引擎，内存数据库用于快速演示，PostgreSQL 可以用于生产环境。
-    - 数据库结构：互联网架构中一般不会使用外键，这个数据量很小，外键不会影响性能，所以用了外键。
-    - 监控：使用 VictoriaMetrics 和 Grafana 监控服务的性能。
+	- 数据库结构：互联网架构中一般不会使用外键，这个数据量很小，外键不会影响性能，所以用了外键。
+	- 监控：使用 VictoriaMetrics 和 Grafana 监控服务的性能。
 
 ## 运行环境
 
@@ -89,35 +86,49 @@ Demo 中不包含的功能：
 1. 以下命令任选其一：
 
     ```bash
-    make run-local # 在本机直接运行 go 代码
+    make run-local # 本机直接运行 go 代码，在 8080 端口启动后端 API
     # 或者
-	make run-docker # 使用 docker 运行后端和前端
+	make run-docker # 使用 docker 运行后端，在 8080 端口启动后端 API
     # 或者
-    make run-all # 使用 docker 运行后端、前端和监控，使用内存数据库快速演示
+    make run-all # 使用 docker 运行后端、前端和监控，在 5173 端口访问前端
     ```
 
-2. 根据提示选择存储引擎（内存数据库或 PostgreSQL）, 
+2. 根据提示选择存储引擎（内存数据库或 PostgreSQL）
 
-   1. 如果选择使用内存数据库，除了 go 代码本身以外没有其他依赖，进入第 3 步。
+	1. 如果选择使用内存数据库，除了 go 代码本身以外没有其他依赖，进入第 3 步。
 
-   2. 如果选择 PostgreSQL，脚本将在 Docker 中运行数据库。
-      1. 选择是否需要重建数据库，脚本会自动完成建表操作，初次运行不需要选择。
-      2. 详细请参考文档：[使用 PostgreSQL 作为存储引擎](docs/postgresql/Use-PostgreSQL.md)
+	2. 如果选择 PostgreSQL，脚本将在 Docker 中运行数据库。
+		1. 初次运行**不需要**手动建表, 默认 N 即可。
+		2. 如果选了 yes, 脚本会**清空数据库**, 然后重新建表，详细请参考文档：[使用 PostgreSQL 作为存储引擎](docs/postgresql/Use-PostgreSQL.md)
 
-3. 后端 API 将在 `http://localhost:8080` 上可用。
-   1. 前端： `http://localhost:5173`
-   2. Grafana： `http://localhost:3000`，用户 admin 密码 admin
-   3. VictoriaMetrics： `http://localhost:8428`
+3. 后端 API 将在 http://localhost:8080 上可用。
+	1. 前端：除了 `run-local` 以外的命令都会启动前端，请手动打开地址：http://localhost:5173
+	2. Grafana： http://localhost:3000 ，默认不需要登录，管理员 admin 密码 admin
+	3. VictoriaMetrics： http://localhost:8428
 
 4. 使用 curl 或 Insomnia 测试端点：
 
-	```bash
-	# 测试获取服务列表
-	curl -H "Authorization: Bearer dummy_token" http://localhost:8080/api/v1/services
-	
-	# 测试获取特定服务详情
-	curl -H "Authorization: Bearer dummy_token" http://localhost:8080/api/v1/services/1
-	```
+   ```bash
+   # 测试获取服务列表
+   curl -H "Authorization: Bearer dummy_token" http://localhost:8080/api/v1/services
+   
+   # 测试获取特定服务详情
+   curl -H "Authorization: Bearer dummy_token" http://localhost:8080/api/v1/services/1
+   ```
+
+### Docker compose 容器列表
+
+如果选了 `run-all` 会启动以下容器：
+
+<img width="507" alt="image" src="https://github.com/daymade/catalog-service-management-api/assets/4291901/55678654-e645-4d5c-9e52-6680b2cc4ab2">
+
+- app: 后端应用
+- db: PostgreSQL 数据库(非必需)
+- grafana: 监控面板
+- jaeger: 分布式追踪
+- otel-collector: open telemetry 收集器
+- ui: 前端应用
+- victoria-metrics: 时序数据库
 
 ## 业务建模
 ```

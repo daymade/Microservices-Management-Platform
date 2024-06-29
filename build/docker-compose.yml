@@ -1,4 +1,32 @@
 services:
+  app:
+    build:
+      context: ..
+      dockerfile: build/Dockerfile
+    environment:
+      - USE_DB=true
+      - DB_HOST=db
+      - DB_USER=user
+      - DB_PASSWORD=password
+      - DB_NAME=services_db
+      - DB_PORT=5432
+    ports:
+      - "8080:8080"
+      - "9090:9090"
+    depends_on:
+      - victoria-metrics
+      - jaeger
+      - otel-collector
+
+  ui:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    depends_on:
+      - app
+
   db:
     image: postgres:13
     environment:
@@ -10,5 +38,76 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+  victoria-metrics:
+    image: victoriametrics/victoria-metrics
+    ports:
+      - "8428:8428"
+    command:
+      - '--selfScrapeInterval=0'
+      - '--promscrape.config=/etc/prometheus/prometheus.yml'
+      - '--storageDataPath=/storage'
+      - '--retentionPeriod=1'  # 保留1个月的数据
+    volumes:
+      - ./config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - victoria-metrics-storage:/storage
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    ports:
+      - "16686:16686"  # UI
+      - "14268:14268"  # Collector HTTP
+      - "14250:14250"  # Collector gRPC
+    environment:
+      - SPAN_STORAGE_TYPE=badger
+      - BADGER_EPHEMERAL=false
+      - BADGER_DIRECTORY_VALUE=/tmp/badger/data
+      - BADGER_DIRECTORY_KEY=/tmp/badger/key
+      - JAEGER_BADGER_RETENTION_PERIOD=7d  # 保留7天的数据
+    volumes:
+      - jaeger-data:/tmp
+
+  otel-collector:
+    image: otel/opentelemetry-collector:latest
+    command: ["--config=/etc/otel-collector-config.yaml"]
+    volumes:
+      - ./config/otel/otel-collector-config.yaml:/etc/otel-collector-config.yaml
+    ports:
+      - "4317:4317"   # OTLP gRPC receiver
+    depends_on:
+      - victoria-metrics
+      - jaeger
+
+  grafana:
+    image: grafana/grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-storage:/var/lib/grafana
+      - ./config/grafana/grafana.ini:/etc/grafana/grafana.ini
+      - ./config/grafana/dashboards:/var/lib/grafana/dashboards
+      - ./config/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+      - ./config/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+
+  migrate:
+    build:
+      context: ..
+      dockerfile: build/tool/migrate/Dockerfile
+    entrypoint: [ "migrate" ]
+    volumes:
+      - ../scripts/db/migrations:/migrations
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db
+      DB_USER: user
+      DB_PASSWORD: password
+      DB_NAME: services_db
+      DB_PORT: 5432
+
 volumes:
+  victoria-metrics-storage:
+  jaeger-data:
+  grafana-storage:
   postgres_data:

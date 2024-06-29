@@ -1,12 +1,19 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	// _ imports the swagger docs
 	_ "catalog-service-management-api/api"
 	"catalog-service-management-api/internal/adapter/api"
 	"os"
 	"os/signal"
 	"syscall"
+)
+
+const (
+	srvAddr     = ":8080"
+	metricsAddr = ":9090"
 )
 
 // @title           Catalog Service Management
@@ -26,18 +33,28 @@ import (
 // @in header
 // @name Authorization
 func main() {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
 	http := api.NewHTTPServer()
 
 	// 启动 http api server
 	go func() {
-		if err := http.Run(":8080"); err != nil {
+		if err := http.Run(srvAddr); err != nil {
 			fmt.Println("Failed to run server:", err)
+		}
+	}()
+
+	// 启动 open telemetry 的 metrics 和 tracing
+	go func() {
+		if err := http.RunOTel(ctx, metricsAddr); err != nil {
+			fmt.Println("Failed to run metrics server:", err)
 		}
 	}()
 
 	// 监听退出信号
 	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
+	signal.Notify(quit, os.Interrupt, syscall.SIGTERM, syscall.SIGINT)
 
 	// 等待信号
 	<-quit

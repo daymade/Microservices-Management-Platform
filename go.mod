@@ -3,6 +3,7 @@ module catalog-service-management-api
 go 1.22.2
 
 require (
+	github.com/Masterminds/semver/v3 v3.2.1
 	github.com/gin-contrib/cors v1.7.2
 	github.com/gin-gonic/gin v1.10.0
 	github.com/prometheus/client_golang v1.19.1

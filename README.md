@@ -20,10 +20,6 @@ The demo does not include:
 - Role-based authorization mechanism.
 - CRUD operations for services.
 
-Known bugs:
-- The width of the service detail page on the frontend is incorrect. Fixing it requires significant effort, so it is temporarily skipped as it is still usable.
-- Grafana can automatically import data sources but requires manual import of the Dashboard: `build/config/grafana/dashboards/Go Metrics-1719497538877.json`.
-
 Directory structure:
 ```
 .
