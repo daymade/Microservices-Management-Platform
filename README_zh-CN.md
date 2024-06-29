@@ -3,7 +3,9 @@
 * [English](README.md)
 * [简体中文](README_zh-CN.md)
 
-https://github.com/daymade/catalog-service-management-api/assets/4291901/f30dd4e7-23d6-4a17-a13d-6c644343b7fd
+<a href="https://asciinema.org/a/CATqU6FRQWSHzVb6L193EoKTR" target="_blank"><img src="https://asciinema.org/a/CATqU6FRQWSHzVb6L193EoKTR.svg" /></a>
+
+https://github.com/daymade/catalog-service-management-api/assets/4291901/7ecb4d40-935f-4f2a-9c41-2d376f62d5b8
 
 Service Catalog Demo 是一个微服务 API 管理平台，用户可以在前端 Dashboard 管理服务和版本。
 
