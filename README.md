@@ -1,3 +1,5 @@
+Here's the English translation of the document:
+
 # Service Catalog Demo
 
 * [English](README.md)
@@ -7,139 +9,153 @@
 
 https://github.com/daymade/catalog-service-management-api/assets/4291901/7ecb4d40-935f-4f2a-9c41-2d376f62d5b8
 
-Service Catalog Demo is a microservices API management platform allowing users to manage services and versions via a frontend dashboard.
+Service Catalog Demo is a microservice API management platform where users can manage services and versions through a frontend dashboard.
 
-This project provides the backend code for Service Catalog Demo, enabling the entire platform, including backend, frontend, and monitoring, to be started from here.
+This project is the backend code for the Service Catalog Demo, from which you can launch the entire platform, including the backend, frontend, and monitoring.
 
-The demo includes the following features:
-- List and Get interfaces for Services, supporting search, filter, sort, pagination, and detailed view functionalities.
-- A simple API Key-based authentication mechanism.
-- Support for both in-memory and PostgreSQL storage engines.
-- Uses makefile to generate test coverage reports and swagger documentation.
-- Uses Docker Compose to start backend, frontend, and monitoring.
-  - Supports monitoring Golang metrics and HTTP APIs with Grafana, including two built-in dashboards.
-  - Integrated with OpenTelemetry and Jaeger for distributed tracing.
+## Features included in the demo:
+- Basic requirements: Service supports search, filtering, sorting, pagination, viewing details, and other functions
+	- List returns a list of services (supports filtering, sorting, pagination):
+		- Implemented at the `/api/v1/services` endpoint
+		- Supports fuzzy search and filtering through `name` and `description` fields
+		- Supports sorting by `name` and `created_at` fields
+		- Implements pagination mechanism based on `offset` and `limit`
+	- Get retrieves details of a specific service:
+		- Implemented at the `/api/v1/services/{id}` endpoint
+		- Includes all version information of the service
+- Authentication mechanism:
+	- Implements a simple authentication mechanism based on API Key
+- Multiple storage engine support:
+	- Supports in-memory database and PostgreSQL as storage engines
+- Monitoring and tracing
+	- Integrates Grafana and VictoriaMetrics for performance monitoring
+		- Provides two pre-configured dashboards for monitoring Golang Metrics and HTTP API
+	- Uses OpenTelemetry and Jaeger for distributed tracing
+- Developer experience:
+	- Uses Swagger to generate API documentation
+	- Provides a Makefile to simplify development and deployment processes
+	- Automated unit tests and integration tests, supports generating test coverage reports
+- Containerized deployment:
+	- Uses docker compose to start backend, frontend, and monitoring
 
-The demo does not include:
-- Role-based authorization mechanisms.
-- CRUD operations for Services.
+Features not included in the demo:
+- Role-based authorization mechanism
+- CRUD operations for Service
 
-## Directory Structure
+## Directory structure:
 
 ```
 .
-├── Makefile  # Project's makefile, use 'make' command to quickly run, test, and build the project
-├── api       # Auto-generated swagger documentation
-├── assets    # Static resources like images
-├── build     # CI/CD related files, includes Dockerfile, Grafana and VictoriaMetrics configuration files
-├── cmd       # Main entry point of the code
-├── docs      # Detailed documentation
-├── internal  # Most of the project code is here
-├── scripts   # Scripts called by makefile, includes Docker Compose and database initialization scripts
-└── test      # Test data
+├── Makefile # Project makefile, use make commands to quickly run, test, and build the project
+├── api      # Automatically generated swagger documentation
+├── assets   # Static resources like images
+├── build    # CI/CD related, including docker file, grafana and victoriametrics configuration files
+├── cmd      # Code main entry
+├── docs     # Detailed documentation
+├── internal # Most of the project code is here
+├── scripts  # Scripts called by makefile, including docker-compose and database initialization scripts
+└── test     # Stores test data
 ```
 
 ## Demo Background Statement
 
-> In actual project development, we need to communicate product details back and forth with product managers, designers, and business operators,
-> to confirm details not fully determined in the first version of the product documentation PDF.
-> Due to the special nature of the project, I have made some assumptions about usage scenarios, simply to reduce communication overhead with the interviewer.
+> In actual project development, we need to communicate back and forth with product managers, designers, and business operations personnel to determine details that were not fully defined in the first version of the product documentation PDF.
+> Due to the special nature of this project, I've made some simple assumptions about usage scenarios here, just to reduce communication overhead with the interviewer.
 
 We have the following assumptions:
 
-- Business Definition:
-  - We assume each Service is a backend API project containing a series of API collections.
-  - Version management is at the Service level rather than the API level. For example, a `/v1` Service may contain 10 APIs, while a `/v2` Service may contain 12 APIs. Version numbers follow the pattern `v1`, `v2`, but can be any value that conforms to semantic versioning. We know Google's API is like `v2024-06-26`.
-  - Multi-tenancy is not designed; we only design the core Service Cards without cross-region and multi-tenant considerations like Region and Tenant.
-  - Permission control: Users can see their own projects and **also** see others' projects. Implementing user-level project filtering is not within the scope of this phase.
+- Business definition:
+	- We assume each Service is a backend API project containing a series of API collections
+	- Version management: Services have version management, with versioning at the Service level rather than the API level. For example, a `/v1` Service might contain 10 APIs, while a `/v2` Service might contain 12 APIs. Version numbers follow the rule of `v1`, `v2`, but can be any value conforming to semantic versioning. We know that Google Cloud's APIs are like `v2024-06-26`.
+	- Multi-tenancy: Only the core Service Cards are designed, without cross-region and multi-tenant design considerations like Region, Tenant.
+	- Access control: Users can see their own projects and **also** see other people's projects. Implementing project filtering at the user level is not within the scope of this phase.
 
-- Functional Requirements:
-  - Search and Filter: Users can search for a specific Service by name and description, but not by other fields.
-  - Sorting: Users can sort by name and creation time.
-  - Pagination: Due to the small data volume, we support jumping to a specific page, otherwise, only support previous and next page.
-  - Detailed View: Users can view the details of a Service, including version list and API list.
-  - Developer Experience:
-    - UI: The UI should support URL normalization, allowing navigation to any intermediate page via URL, for example:
-      - `services` is the list page, if filter conditions are input, the URL should change to `services?query=name`.
-      - `services/12` can directly navigate to the detail page of a specific Service.
-    - API: Swagger documentation should be supported for developers to view API documentation.
+- Functional requirements:
+	- Search and filter: Users can search for specific Services by name and description, other fields are not supported
+	- Sorting: Users can sort by name and creation time
+	- Pagination: Since the data volume is small, it can support jumping to a specific page, otherwise only previous and next page navigation is needed
+	- View details: Users can view Service details, including version list, API list, etc.
+	- Developer experience:
+		- UI: Needs to support URL normalization, allowing navigation to any intermediate page through URL, for example:
+			- `services` is the list page, if filter conditions are entered, the URL should change to `services?query=name`.
+			- `services/12` can directly jump to the details page of a specific Service.
+		- API: Needs to support Swagger documentation for developers to easily view interface documentation.
 
-- Non-functional Requirements:
-  - API Standards: We design APIs that conform to [Google API Standards](https://google.aip.dev/).
-  - Data Volume:
-    - Total number of Services: 10 to 10,000
-    - Total number of users: Less than 1,000
-    - Each user can create up to 10 Services.
-    - Each Service can have up to 10 versions.
-  - Monitoring: We need to monitor backend service performance, including:
-    - HTTP API QPS, latency, error rate
-    - Golang metrics: memory, CPU, Goroutine count, etc.
-    - Distributed tracing: We need to trace each request's chain, including HTTP requests, database queries, etc.
+- Non-functional requirements:
+	- API specification: We design APIs that comply with the [Google API Specification](https://google.aip.dev/).
+	- Data volume:
+		- Total number of Services: 10 to 10000
+		- Total number of users: Below 1000
+		- Each user can create a limited number of Services, maximum 10 services.
+		- Number of versions per Service: Maximum 10 versions.
+	- Monitoring: We need to monitor the performance of backend services, including:
+		- HTTP API QPS, latency, error rate
+		- Golang Metrics: Memory, CPU, number of Goroutines, etc.
+		- Distributed tracing: We need to trace the path of each request, including HTTP requests, database queries, etc.
 
-- Technology Stack:
-  - Search: Due to the small data volume, we do not introduce a search engine and implement filtering directly on the database. Index optimization is not considered at this stage.
-  - Storage Engine: We support both in-memory database and PostgreSQL. In-memory database is for quick demonstration, while PostgreSQL can be used in a production environment.
-  - Database Schema: While foreign keys are typically avoided in internet architecture, they are used here due to the small data volume, as the performance impact is minimal.
-  - Monitoring: VictoriaMetrics and Grafana are used for monitoring service performance. OpenTelemetry and Jaeger are used for distributed tracing.
+- Technology selection:
+	- Search: Due to the small data volume, we don't introduce a search engine. We can use PostgreSQL's built-in trigram index to optimize fuzzy search performance.
+	- Storage engine: We support both in-memory database and PostgreSQL as storage engines. The in-memory database is for quick demonstrations, while PostgreSQL can be used for production environments.
+	- Database structure: Internet architectures generally don't use foreign keys. In this scenario, the data volume is very small, so foreign keys won't significantly affect performance, so we used foreign keys.
+	- Monitoring: Use VictoriaMetrics and Grafana to monitor service performance, OpenTelemetry and Jaeger for distributed tracing.
 
-## Environment Requirements
+## Running Environment
 
 - Go 1.22 or higher
-- Docker and Docker Compose (required for PostgreSQL; not needed for in-memory database)
+- Docker and Docker Compose (needed when using PostgreSQL), not required when using in-memory database
 
 ## Quick Start
 
-### Running the Application
+### Running
 
 1. Choose one of the following commands:
 
     ```bash
-    make run-local # Run Go code directly on the local machine, starting backend API on port 8080
+    make run-local # Run Go code directly on the local machine, start backend API on port 8080
     # or
-    make run-docker # Run backend using Docker, starting backend API on port 8080
+    make run-docker # Run backend using docker, start backend API on port 8080
     # or
-    make run-all # Run backend, frontend, and monitoring using Docker, access frontend on port 5173
+    make run-all # Run backend, frontend, and monitoring using docker, access frontend on port 5173
     ```
 
-2. Choose the storage engine (in-memory database or PostgreSQL) as prompted.
+2. Follow the prompts to select the storage engine (in-memory database or PostgreSQL)
 
-    1. If you choose the in-memory database, there are no dependencies other than the Go code itself, proceed to step 3.
+	1. If you choose to use the in-memory database, there are no dependencies other than the Go code itself, proceed to step 3.
 
-    2. If you choose PostgreSQL, the script will run the database inside Docker.
-        1. On first run, you **do not** need to manually create tables, just select N.
-        2. If you select yes, the script will **clear the database** and recreate tables. Refer to the documentation for details: [Using PostgreSQL as Storage Engine](docs/postgresql/Use-PostgreSQL.md)
+	2. If you choose PostgreSQL, the script will run the database in Docker.
+		1. For the first run, you **don't need** to manually create tables, default N is fine.
+		2. If you choose yes, the script will **clear the database**, then recreate tables, for details please refer to the document: [Using PostgreSQL as Storage Engine](docs/postgresql/Use-PostgreSQL.md)
 
 3. The backend API will be available at http://localhost:8080.
-    1. Frontend: All commands except `run-local` will start the frontend. Manually open: http://localhost:5173
-    2. Grafana: http://localhost:3000, default login is not required, admin password is admin.
-    3. VictoriaMetrics: http://localhost:8428
+	1. Frontend: All commands except `run-local` will start the frontend, please manually open the address: http://localhost:5173
+	2. Grafana: http://localhost:3000, no login required by default, admin username is admin, password is admin
+	3. VictoriaMetrics: http://localhost:8428
 
 4. Test endpoints using curl or Insomnia:
 
-    ```bash
-    # Test fetching service list
-    curl -H "Authorization: Bearer dummy_token" http://localhost:8080/api/v1/services
-    
-    # Test fetching specific service details
-    curl -H "Authorization: Bearer dummy_token" http://localhost:8080/api/v1/services/1
-    ```
+   ```bash
+   # Test getting service list
+   curl -H "Authorization: Bearer dummy_token" http://localhost:8080/api/v1/services
+   
+   # Test getting specific service details
+   curl -H "Authorization: Bearer dummy_token" http://localhost:8080/api/v1/services/1
+   ```
 
-### Docker Compose Containers
+### Docker compose container list
 
-Running `run-all` will start the following containers:
+If you chose `run-all`, the following containers will be started:
 
-<img width="507" alt="image" src="https://github.com/daymade/catalog-service-management-api/assets/4291901/55678654-e645-4d5c-9e52-6680b2cc4ab2">
+<img width="507" alt="image" src="https://github.com/daymade/catalog-service-management-api/assets/4291901/55678654-e645-4d5c-9e52-6280b2cc4ab2">
 
 - app: Backend application
 - db: PostgreSQL database (optional)
 - grafana: Monitoring dashboard
 - jaeger: Distributed tracing
-- otel-collector: OpenTelemetry collector
+- otel-collector: Open Telemetry collector
 - ui: Frontend application
-- victoria-metrics: Time-series database
+- victoria-metrics: Time series database
 
 ## Business Modeling
-
 ```
 +-------------------+           +-------------------+
 |       User        |           |     Service       |
@@ -172,26 +188,69 @@ Running `run-all` will start the following containers:
                                 | - versionId: int  |
                                 +-------------------+
 ```
-
 Define the domain model of an API management platform,
-- Includes the concept of [user, service, version, api]
+- Include the concepts of [user, service, version, API]
 - Each service can be created by only one user
 - Each service has multiple versions
-- Each service contains multiple APIs, related to a specific version
+- Each service contains multiple APIs, related to specific versions
 
 ## Architecture Diagram
 
-### A Layered Architecture Similar to [COLA](https://github.com/alibaba/COLA)
+### Layered architecture similar to [COLA](https://github.com/alibaba/COLA)
 
-The domain is at the core, with different protocol adapters such as HTTP API or gRPC at the presentation layer.
+With domain as the core, different protocol adapters like HTTP API or gRPC can exist at the presentation layer.
 
 <img width="566" alt="image" src="https://github.com/daymade/catalog-service-management-api/assets/4291901/4cc9a67b-5356-40a7-840d-6154c8b3d68c">
 
-### Class Dependency Relationships Related to Service
+### Class dependency relationship related to Service
 
-The app layer depends on the domain layer's interfaces, which are implemented by the infra layer. The app layer is responsible for injecting infra into the domain, with dependencies as follows: app -> domain <- infra.
+The app layer depends on the domain layer's interfaces, the domain's interfaces are implemented by the infra layer, and the app is responsible for injecting infra into domain. The dependency relationship is: app -> domain <- infra.
 
 <img width="558" alt="image" src="https://github.com/daymade/catalog-service-management-api/assets/4291901/4e73e449-1e44-4dfa-a957-a5703b1b8ebb">
+
+## Testing
+
+This project includes various types of tests to ensure code quality and functional correctness.
+
+### Unit Tests
+
+To run all unit tests:
+
+```bash
+make test
+```
+
+This will execute all unit tests and display the results.
+
+### Test Coverage
+
+To generate a test coverage report:
+
+```bash
+make test-coverage
+```
+
+This command will run the tests and generate a coverage report. You can view detailed coverage information in the `coverage.html` file.
+
+### Integration Tests
+
+To run integration tests:
+
+```bash
+make test-integration
+```
+
+Integration tests check if the interactions between different components of the system are working correctly.
+
+### Cleaning Test Files
+
+To clean up files generated during the testing process:
+
+```bash
+make test-clean
+```
+
+This will remove the test coverage reports and other temporary files.
 
 ## API Documentation
 

@@ -11,14 +11,30 @@ Service Catalog Demo 是一个微服务 API 管理平台，用户可以在前端
 
 本项目是 Service Catalog Demo 的后端代码，可以从这里启动整个平台，包括后端，前端和监控。
 
-Demo 包含以下功能：
-- Service 的 List 和 Get 接口，支持搜索、过滤、排序、分页、查看详情等功能
-- 基于 API Key 的简单认证机制
-- 支持使用内存和 PostgreSQL 两种存储引擎
-- 使用 makefile 生成测试覆盖率报告，生成 swagger 文档
-- 使用 docker compose 启动后端、前端和监控
-  - 支持使用 Grafana 监控 Golang Metrics 和 HTTP API，内置了两个监控 dashboard
-  - 集成了 Open Telemetry 和 Jaeger 分布式追踪
+## Demo 包含功能：
+- 基本需求：Service 支持搜索、过滤、排序、分页、查看详情等功能
+  - List 返回服务列表（支持过滤、排序、分页）：
+	  - 实现于 `/api/v1/services` 端点
+	  - 支持通过 `name` 和 `description` 字段进行模糊搜索和过滤
+	  - 支持通过 `name` 和 `created_at` 字段排序
+	  - 实现了基于 `offset` 和 `limit` 的分页机制
+  - Get 获取特定服务详情：
+	  - 实现于 `/api/v1/services/{id}` 端点
+	  - 包含服务的所有版本信息
+- 认证机制：
+  - 实现了基于 API Key 的简单认证机制
+- 多存储引擎支持：
+  - 支持内存数据库和 PostgreSQL 两种存储引擎
+- 监控和追踪
+  - 集成了 Grafana 和 VictoriaMetrics 用于性能监控
+    - 提供了两个预配置的 dashboard，用于监控 Golang Metrics 和 HTTP API
+  - 使用 OpenTelemetry 和 Jaeger 实现分布式追踪
+- 开发者体验：
+  - 使用 Swagger 生成 API 文档
+  - 提供了 Makefile 以简化开发和部署流程
+  - 自动化单元测试和集成测试，支持生成测试覆盖率报告
+- 容器化部署：
+  - 使用 docker compose 启动后端、前端和监控
 
 Demo 中不包含的功能：
 - 基于角色的授权机制
@@ -77,7 +93,7 @@ Demo 中不包含的功能：
 		- 分布式追踪：我们需要追踪每个请求的链路，包括 HTTP 请求、数据库查询等
 
 - 技术选型：
-	- 搜索：由于数据量很小，我们不引入搜索引擎，直接在数据库上实现过滤, 现阶段也不用考虑索引优化。
+	- 搜索：由于数据量很小，我们不引入搜索引擎，可以使用 PostgreSQL 的内置 trigram 索引优化模糊搜索的性能。
 	- 存储引擎：我们支持内存数据库和 PostgreSQL 两种存储引擎，内存数据库用于快速演示，PostgreSQL 可以用于生产环境。
 	- 数据库结构：互联网架构中一般不会使用外键，这个场景的数据量很小，外键不会影响太多性能，所以用了外键。
 	- 监控：使用 VictoriaMetrics 和 Grafana 监控服务的性能，OpenTelemetry 和 Jaeger 进行分布式追踪。
@@ -171,11 +187,11 @@ Demo 中不包含的功能：
                                 | - versionId: int  |
                                 +-------------------+
 ```
-define the domain model of an api management platform,
-- include the concept of [user,service,version,api]
-- each service can be created by only one user
-- each service has multiple version
-- each service contains multiple apis, related with specific version
+定义 API 管理平台的领域模型，
+- 包含以下概念：[用户、服务、版本、API]
+- 每个服务只能由一个用户创建
+- 每个服务有多个版本
+- 每个服务包含多个 API，这些 API 与特定版本相关联
 
 ## 架构图
 
@@ -190,6 +206,50 @@ define the domain model of an api management platform,
 app 层依赖 domain 层的接口，domain 的接口由 infra 层实现，app 负责注入 infra 到 domain，依赖关系为：app -> domain <- infra。
 
 <img width="558" alt="image" src="https://github.com/daymade/catalog-service-management-api/assets/4291901/4e73e449-1e44-4dfa-a957-a5703b1b8ebb">
+
+## 测试
+
+本项目包含多种测试类型，以确保代码质量和功能正确性。
+
+### 单元测试
+
+运行所有单元测试：
+
+```bash
+make test
+```
+
+这将执行所有的单元测试，并显示测试结果。
+
+### 测试覆盖率
+
+生成测试覆盖率报告：
+
+```bash
+make test-coverage
+```
+
+这个命令会运行测试并生成覆盖率报告。您可以在 `coverage.html` 文件中查看详细的覆盖率信息。
+
+### 集成测试
+
+运行集成测试：
+
+```bash
+make test-integration
+```
+
+集成测试会检查系统各个组件之间的交互是否正常。
+
+### 清理测试文件
+
+清理测试过程中生成的文件：
+
+```bash
+make test-clean
+```
+
+这将删除测试覆盖率报告和其他临时文件。
 
 ## API 文档
 
