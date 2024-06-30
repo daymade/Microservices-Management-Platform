@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"errors"
 	"fmt"
 	"catalog-service-management-api/internal/domain/models"
 	"catalog-service-management-api/internal/infrastructure/entity"
@@ -75,11 +76,16 @@ func (p *PostgresStorage) ListServices(query string, sortBy string, sortDir stri
 	return result, int(total), db.Error
 }
 
+var ErrServiceNotFound = errors.New("service not found")
+
 func (p *PostgresStorage) GetService(id string) (models.Service, error) {
 	var service entity.Service
-	result := p.db.Preload(VersionTableName).First(&service, id)
-	if result.Error != nil {
-		return models.Service{}, result.Error
+	err := p.db.Preload(VersionTableName).First(&service, id).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return models.Service{}, ErrServiceNotFound
+		}
+		return models.Service{}, err
 	}
 	return toDomainService(service), nil
 }

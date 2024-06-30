@@ -4,6 +4,7 @@ import (
 	"errors"
 	"catalog-service-management-api/internal/adapter/api/viewmodel"
 	"catalog-service-management-api/internal/app/service"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -86,7 +87,13 @@ func (h *ServiceHandler) GetService(c *gin.Context) {
 
 	s, err := h.manager.GetService(id)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		if errors.Is(err, service.ErrServiceNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Service not found"})
+		} else {
+			log.Println("Failed to get service:", err)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
+		}
+
 		return
 	}
 
@@ -105,14 +112,27 @@ func validateListServicesInput(query, sortBy, sortDir string, page, pageSize int
 	if sortDir != "asc" && sortDir != "desc" {
 		return errors.New("sort_direction must be 'asc' or 'desc'")
 	}
+
+	allowedSortFields := map[string]bool{
+		"name":       true,
+		"created_at": true,
+	}
+	if !allowedSortFields[sortBy] {
+		return errors.New("invalid sort field")
+	}
+
 	// Add more validations as needed
 	return nil
 }
 
 func validateServiceID(id string) error {
-	// Add your validation logic here
 	if id == "" {
 		return errors.New("service ID cannot be empty")
+	}
+	// 假设服务 ID 应该是一个正整数
+	_, err := strconv.Atoi(id)
+	if err != nil {
+		return errors.New("invalid service ID format")
 	}
 	return nil
 }

@@ -1,6 +1,7 @@
 package service
 
 import (
+	"errors"
 	"fmt"
 	"catalog-service-management-api/internal/app/util/version"
 	"catalog-service-management-api/internal/domain"
@@ -54,10 +55,15 @@ func (sm *Manager) ListServices(query string, sortBy string, sortDir string, pag
 	return services, total, nil
 }
 
+var ErrServiceNotFound = errors.New("service not found")
+
 // GetService 获取单个服务
 func (sm *Manager) GetService(id string) (models.Service, error) {
 	service, err := sm.service.GetService(id)
 	if err != nil {
+		if errors.Is(err, storage.ErrServiceNotFound) {
+			return models.Service{}, ErrServiceNotFound
+		}
 		return models.Service{}, err
 	}
 
