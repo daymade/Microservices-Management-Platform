@@ -59,21 +59,36 @@ func (p *PostgresStorage) ListServices(query string, sortBy string, sortDir stri
 		db = db.Where("name ILIKE ? OR description ILIKE ?", "%"+query+"%", "%"+query+"%")
 	}
 
-	db.Count(&total)
-
-	if sortBy != "" {
-		db = db.Order(sortBy + " " + sortDir)
+	// Count total before pagination
+	if err := db.Count(&total).Error; err != nil {
+		return nil, 0, fmt.Errorf("error counting services: %w", err)
 	}
 
+	// Apply sorting
+	switch sortBy {
+	case "name", "created_at":
+		if sortDir != "asc" && sortDir != "desc" {
+			sortDir = "desc"
+		}
+		db = db.Order(fmt.Sprintf("%s %s", sortBy, sortDir))
+	default:
+		db = db.Order("created_at desc")
+	}
+
+	// Apply pagination
 	offset := (page - 1) * pageSize
-	db = db.Offset(offset).Limit(pageSize).Find(&services)
+	db = db.Offset(offset).Limit(pageSize)
+
+	if err := db.Find(&services).Error; err != nil {
+		return nil, 0, fmt.Errorf("error fetching services: %w", err)
+	}
 
 	var result []models.Service
 	for _, s := range services {
 		result = append(result, toDomainService(s))
 	}
 
-	return result, int(total), db.Error
+	return result, int(total), nil
 }
 
 var ErrServiceNotFound = errors.New("service not found")
