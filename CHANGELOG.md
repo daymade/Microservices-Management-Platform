@@ -1,3 +1,17 @@
+## 0.1.2 (2024-06-30)
+
+### Fix
+
+- **api**: fix mismatching http status code when not found service by id
+
+### Refactor
+
+- **postgres**: improve params validation
+
+### Perf
+
+- **postgres**: add index on name and desciptions
+
 ## 0.1.1 (2024-06-29)
 
 ### Fix
