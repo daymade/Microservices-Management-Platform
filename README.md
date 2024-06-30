@@ -145,7 +145,7 @@ We have the following assumptions:
 
 If you chose `run-all`, the following containers will be started:
 
-<img width="507" alt="image" src="https://github.com/daymade/catalog-service-management-api/assets/4291901/55678654-e645-4d5c-9e52-6280b2cc4ab2">
+<img src="./assets/images/docker-compose.png" width="500" alt="docker-compose">
 
 - app: Backend application
 - db: PostgreSQL database (optional)
@@ -200,13 +200,13 @@ Define the domain model of an API management platform,
 
 With domain as the core, different protocol adapters like HTTP API or gRPC can exist at the presentation layer.
 
-<img width="566" alt="image" src="https://github.com/daymade/catalog-service-management-api/assets/4291901/4cc9a67b-5356-40a7-840d-6154c8b3d68c">
+<img src="./assets/images/cola.png" width="500" alt="cola">
 
 ### Class dependency relationship related to Service
 
 The app layer depends on the domain layer's interfaces, the domain's interfaces are implemented by the infra layer, and the app is responsible for injecting infra into domain. The dependency relationship is: app -> domain <- infra.
 
-<img width="558" alt="image" src="https://github.com/daymade/catalog-service-management-api/assets/4291901/4e73e449-1e44-4dfa-a957-a5703b1b8ebb">
+<img src="./assets/images/class-diagram.png" width="500" alt="class-diagram">
 
 ## Testing
 
@@ -270,5 +270,5 @@ http://localhost:8080/swagger/index.html
 
 ### GPT-4o-128k
 <a href="https://www.openai.com/gpt-4" class="" data-hovercard-type="user" data-hovercard-url="/users/gpt-4/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self">
-  <img src="https://github.com/daymade/catalog-service-management-api/assets/4291901/1bd3390f-4319-44c2-9288-7208e9dc25f8" alt="GPT-4" height="64" style="border-radius: 50%; margin-right: 10px;">
+    <img src="./assets/images/chatgpt4o-logo.jpeg" width="114" alt="docker-compose-containers">
 </a>

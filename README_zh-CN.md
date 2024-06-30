@@ -144,7 +144,7 @@ Demo 中不包含的功能：
 
 如果选了 `run-all` 会启动以下容器：
 
-<img width="507" alt="image" src="https://github.com/daymade/catalog-service-management-api/assets/4291901/55678654-e645-4d5c-9e52-6680b2cc4ab2">
+<img src="./assets/images/docker-compose.png" width="500" alt="docker-compose">
 
 - app: 后端应用
 - db: PostgreSQL 数据库(非必需)
@@ -199,13 +199,13 @@ Demo 中不包含的功能：
 
 以 domain 为核心，在表现层可以有 http api 或 grpc 等不同协议的 adapter。
 
-<img width="566" alt="image" src="https://github.com/daymade/catalog-service-management-api/assets/4291901/4cc9a67b-5356-40a7-840d-6154c8b3d68c">
+<img src="./assets/images/cola.png" width="500" alt="cola">
 
 ### 和 Service 相关的类依赖关系
 
 app 层依赖 domain 层的接口，domain 的接口由 infra 层实现，app 负责注入 infra 到 domain，依赖关系为：app -> domain <- infra。
 
-<img width="558" alt="image" src="https://github.com/daymade/catalog-service-management-api/assets/4291901/4e73e449-1e44-4dfa-a957-a5703b1b8ebb">
+<img src="./assets/images/class-diagram.png" width="500" alt="class-diagram">
 
 ## 测试
 
@@ -269,5 +269,5 @@ http://localhost:8080/swagger/index.html
 
 ### GPT-4o-128k
 <a href="https://www.openai.com/gpt-4" class="" data-hovercard-type="user" data-hovercard-url="/users/gpt-4/hovercard" data-octo-click="hovercard-link-click" data-octo-dimensions="link_type:self">
-  <img src="https://github.com/daymade/catalog-service-management-api/assets/4291901/1bd3390f-4319-44c2-9288-7208e9dc25f8" alt="GPT-4" height="64" style="border-radius: 50%; margin-right: 10px;">
+    <img src="./assets/images/chatgpt4o-logo.jpeg" width="114" alt="docker-compose-containers">
 </a>
