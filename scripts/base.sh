@@ -31,7 +31,7 @@ perform_migration() {
   docker exec -i catalog-service-management-api-db-1 psql -U $DB_USER -d $DB_NAME -c "DROP TABLE IF EXISTS versions, services, users, schema_migrations CASCADE;" && log "目标表已删除。" || { log "清理表失败"; exit 1; }
 
   log "执行数据库迁移..."
-  docker-compose -f build/docker-compose.yml run migrate -path /migrations -database "postgres://$DB_USER:$DB_PASSWORD@$DB_HOST:$DB_PORT/$DB_NAME?sslmode=disable" up || { log "数据库迁移失败"; exit 1; }
+  docker-compose -f build/docker-compose.yml run --rm migrate -path /migrations -database "postgres://$DB_USER:$DB_PASSWORD@$DB_HOST:$DB_PORT/$DB_NAME?sslmode=disable" up || { log "数据库迁移失败"; exit 1; }
   log "数据库迁移完成。"
 
   log "验证迁移是否成功..."

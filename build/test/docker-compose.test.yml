@@ -1,0 +1,25 @@
+services:
+  postgres_test:
+    image: postgres:16.3
+    environment:
+      POSTGRES_DB: testdb
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+    ports:
+      - "5433:5432"  # 使用 5433 作为主机端口，防止冲突
+
+  migrate:
+    build:
+      context: ../..
+      dockerfile: build/tool/migrate/Dockerfile
+    entrypoint: [ "migrate" ]
+    volumes:
+      - ../../scripts/db/migrations:/migrations
+    depends_on:
+      - postgres_test
+    environment:
+      DB_HOST: postgres_test
+      DB_USER: test
+      DB_PASSWORD: test
+      DB_NAME: testdb
+      DB_PORT: 5432

@@ -4,12 +4,12 @@ services:
       context: ..
       dockerfile: build/Dockerfile
     environment:
-      - USE_DB=true
-      - DB_HOST=db
-      - DB_USER=user
-      - DB_PASSWORD=password
-      - DB_NAME=services_db
-      - DB_PORT=5432
+      - USE_DB=${USE_DB:-false}
+      - DB_HOST=${DB_HOST:-db}
+      - DB_USER=${DB_USER:-user}
+      - DB_PASSWORD=${DB_PASSWORD:-password}
+      - DB_NAME=${DB_NAME:-services_db}
+      - DB_PORT=${DB_PORT:-5432}
     ports:
       - "8080:8080"
       - "9090:9090"
@@ -28,7 +28,7 @@ services:
       - app
 
   db:
-    image: postgres:13
+    image: postgres:16.3
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
@@ -39,7 +39,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
 
   victoria-metrics:
-    image: victoriametrics/victoria-metrics
+    image: victoriametrics/victoria-metrics:latest
     ports:
       - "8428:8428"
     command:
@@ -78,7 +78,7 @@ services:
       - jaeger
 
   grafana:
-    image: grafana/grafana
+    image: grafana/grafana:latest
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=admin
     ports:

@@ -33,6 +33,8 @@ vendor/
 .idea/**/usage.statistics.xml
 .idea/**/dictionaries
 .idea/**/shelf
+.idea/codeStyles
+.idea/
 
 # AWS User-specific
 .idea/**/aws.xml
