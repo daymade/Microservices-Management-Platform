@@ -1,5 +1,3 @@
-Here's the English translation of the document:
-
 # Service Catalog Demo
 
 * [English](README.md)
